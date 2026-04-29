@@ -6,6 +6,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Calendar, Plus, TrendingUp, TrendingDown, BarChart3, PieChart, Trash2, Edit2 } from "lucide-react";
+import LaunchModals from "./LaunchModals";
 import { BarChart, Bar, PieChart as RechartsPie, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 
 const currentDate = new Date(2025, 3, 29); // 29 de abril de 2025
@@ -122,6 +123,18 @@ export default function LaunchesSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"today" | "future" | "history" | "tracking">("today");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"receita" | "despesa" | null>(null);
+
+  const openModal = (type: "receita" | "despesa") => {
+    setModalType(type);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalType(null);
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -217,10 +230,26 @@ export default function LaunchesSection() {
                 </div>
               </div>
 
-              <button className="w-full py-4 rounded-xl font-bold text-white text-lg flex items-center justify-center gap-2 lume-btn-green">
-                <Plus className="w-6 h-6" />
-                Adicionar Lançamento Hoje
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={() => openModal("receita")}
+                  className="w-full py-4 rounded-xl font-bold text-white text-lg flex items-center justify-center gap-2 lume-btn-green transition-all hover:-translate-y-1"
+                >
+                  <Plus className="w-6 h-6" />
+                  Adicionar Receita
+                </button>
+                <button
+                  onClick={() => openModal("despesa")}
+                  className="w-full py-4 rounded-xl font-bold text-white text-lg flex items-center justify-center gap-2 transition-all hover:-translate-y-1"
+                  style={{
+                    background: "linear-gradient(135deg, #dc2626, #EF4444)",
+                    boxShadow: "0 4px 15px rgba(239, 68, 68, 0.4)",
+                  }}
+                >
+                  <TrendingDown className="w-6 h-6" />
+                  Adicionar Despesa
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -468,6 +497,8 @@ export default function LaunchesSection() {
             </div>
           </div>
         )}
+
+        <LaunchModals isOpen={modalOpen} type={modalType} onClose={closeModal} />
       </div>
     </section>
   );
