@@ -4,7 +4,7 @@
  * Inclui: seleção de período, calendário, formulário de entrada
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus, Minus, Calendar, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface LaunchModalsProps {
@@ -20,6 +20,7 @@ const categories = {
 
 export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProps) {
   const [step, setStep] = useState<"main" | "period" | "calendar" | "form">("main");
+  const [periodType, setPeriodType] = useState<"today" | "specific" | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [formData, setFormData] = useState({
@@ -30,11 +31,29 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
     endDate: "",
   });
 
+  // Resetar estado quando modal abre/fecha ou tipo muda
+  useEffect(() => {
+    if (isOpen) {
+      setStep("main");
+      setPeriodType(null);
+      setSelectedDate(null);
+      setCurrentMonth(new Date());
+      setFormData({
+        category: "",
+        value: "",
+        description: "",
+        recurrence: "Única",
+        endDate: "",
+      });
+    }
+  }, [isOpen, type]);
+
   const isReceita = type === "receita";
   const bgColor = isReceita ? "#22C55E" : "#EF4444";
   const darkColor = isReceita ? "#1ea853" : "#dc2626";
 
   const handlePeriodSelect = (period: "today" | "specific") => {
+    setPeriodType(period);
     if (period === "today") {
       setSelectedDate(new Date());
       setStep("form");
@@ -67,8 +86,12 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
     if (name === "value") {
       // Format value as currency
       const numValue = value.replace(/\D/g, "");
-      const formatted = (parseInt(numValue) / 100).toFixed(2);
-      setFormData({ ...formData, [name]: formatted });
+      if (numValue) {
+        const formatted = (parseInt(numValue) / 100).toFixed(2);
+        setFormData({ ...formData, [name]: formatted });
+      } else {
+        setFormData({ ...formData, [name]: "" });
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -78,9 +101,6 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
     if (formData.category && formData.value) {
       console.log("Lançamento registrado:", { type, selectedDate, ...formData });
       // Reset and close
-      setStep("main");
-      setFormData({ category: "", value: "", description: "", recurrence: "Única", endDate: "" });
-      setSelectedDate(null);
       onClose();
     }
   };
@@ -88,17 +108,17 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50">
-      <div className="w-full bg-white rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50 animate-in fade-in">
+      <div className="w-full bg-white rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-black text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            {step === "main" && (isReceita ? "Adicionar Receita" : "Adicionar Despesa")}
-            {step === "period" && "Quando você quer registrar?"}
-            {step === "calendar" && "Selecione a data"}
-            {step === "form" && "Preencha os dados"}
+            {step === "main" && (isReceita ? "➕ Adicionar Receita" : "➖ Adicionar Despesa")}
+            {step === "period" && "📅 Quando você quer registrar?"}
+            {step === "calendar" && "📆 Selecione a data"}
+            {step === "form" && "📝 Preencha os dados"}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-all">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -107,8 +127,8 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
         {step === "main" && (
           <div className="space-y-4">
             <button
-              onClick={() => setStep("period")}
-              className="w-full p-6 rounded-2xl border-2 border-gray-200 hover:shadow-lg transition-all text-left"
+              onClick={() => handlePeriodSelect("today")}
+              className="w-full p-6 rounded-2xl border-2 border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all text-left"
               style={{ borderColor: bgColor }}
             >
               <div className="flex items-center gap-3 mb-2">
@@ -121,8 +141,8 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
             </button>
 
             <button
-              onClick={() => setStep("period")}
-              className="w-full p-6 rounded-2xl border-2 border-gray-200 hover:shadow-lg transition-all text-left"
+              onClick={() => handlePeriodSelect("specific")}
+              className="w-full p-6 rounded-2xl border-2 border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all text-left"
               style={{ borderColor: bgColor }}
             >
               <div className="flex items-center gap-3 mb-2">
@@ -138,7 +158,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
               onClick={onClose}
               className="w-full py-4 rounded-xl font-bold text-white text-lg bg-gray-600 hover:bg-gray-700 transition-all"
             >
-              Voltar
+              ⬅ Voltar
             </button>
           </div>
         )}
@@ -150,7 +170,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                className="p-3 rounded-lg hover:bg-gray-100"
+                className="p-3 rounded-lg hover:bg-gray-100 transition-all"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -159,7 +179,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
               </span>
               <button
                 onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                className="p-3 rounded-lg hover:bg-gray-100"
+                className="p-3 rounded-lg hover:bg-gray-100 transition-all"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -225,13 +245,13 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
               <button
                 onClick={handleConfirmDate}
                 disabled={!selectedDate}
-                className="w-full py-4 rounded-xl font-bold text-white text-lg transition-all"
+                className="w-full py-4 rounded-xl font-bold text-white text-lg transition-all flex items-center justify-center gap-2"
                 style={{
                   backgroundColor: selectedDate ? bgColor : "#D1D5DB",
                   opacity: selectedDate ? 1 : 0.5,
                 }}
               >
-                <Check className="w-6 h-6 inline mr-2" />
+                <Check className="w-6 h-6" />
                 Confirmar
               </button>
               <button
@@ -346,10 +366,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
                 Confirmar e Salvar
               </button>
               <button
-                onClick={() => {
-                  setStep("main");
-                  setFormData({ category: "", value: "", description: "", recurrence: "Única", endDate: "" });
-                }}
+                onClick={onClose}
                 className="w-full py-4 rounded-xl font-bold text-white text-lg bg-gray-600 hover:bg-gray-700 transition-all"
               >
                 Cancelar
