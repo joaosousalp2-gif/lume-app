@@ -1,25 +1,32 @@
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
-
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
+/*
+ * Home — Lume
+ * Design: Modernismo Humanista
+ * Página principal com todas as seções do site de apresentação do aplicativo Lume
+ * Público-alvo: pessoas com mais de 60 anos e seus familiares
  */
-export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
 
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import SecuritySection from "@/components/SecuritySection";
+import HowItWorksSection from "@/components/HowItWorksSection";
+import AccessibilitySection from "@/components/AccessibilitySection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import DownloadSection from "@/components/DownloadSection";
+import Footer from "@/components/Footer";
+
+export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
+    <div className="min-h-screen" style={{ fontFamily: "'Nunito', sans-serif" }}>
+      <Navbar />
+      <HeroSection />
+      <FeaturesSection />
+      <SecuritySection />
+      <HowItWorksSection />
+      <AccessibilitySection />
+      <TestimonialsSection />
+      <DownloadSection />
+      <Footer />
     </div>
   );
 }
