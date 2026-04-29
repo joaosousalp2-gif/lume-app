@@ -100,6 +100,22 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
   const handleSubmit = () => {
     if (formData.category && formData.value) {
       console.log("Lançamento registrado:", { type, selectedDate, ...formData });
+      // Reset form for next entry
+      setFormData({
+        category: "",
+        value: "",
+        description: "",
+        recurrence: "Única",
+        endDate: "",
+      });
+      // Voltar para a tela principal para registrar outro
+      setStep("main");
+    }
+  };
+
+  const handleSubmitAndClose = () => {
+    if (formData.category && formData.value) {
+      console.log("Lançamento registrado:", { type, selectedDate, ...formData });
       // Reset and close
       onClose();
     }
@@ -363,7 +379,19 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
                 }}
               >
                 <Check className="w-6 h-6" />
-                Confirmar e Salvar
+                Salvar e Adicionar Outro
+              </button>
+              <button
+                onClick={handleSubmitAndClose}
+                disabled={!formData.category || !formData.value}
+                className="w-full py-4 rounded-xl font-bold text-white text-lg transition-all flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: formData.category && formData.value ? bgColor : "#D1D5DB",
+                  opacity: formData.category && formData.value ? 1 : 0.5,
+                }}
+              >
+                <Check className="w-6 h-6" />
+                Salvar e Fechar
               </button>
               <button
                 onClick={onClose}
