@@ -11,6 +11,7 @@ import FeaturesSection from "@/components/FeaturesSection";
 import SecuritySection from "@/components/SecuritySection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import AccessibilitySection from "@/components/AccessibilitySection";
+import LaunchesSection from "@/components/LaunchesSection";
 import SpreadsheetsSection from "@/components/SpreadsheetsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import DownloadSection from "@/components/DownloadSection";
@@ -24,6 +25,7 @@ export default function Home() {
       <FeaturesSection />
       <SecuritySection />
       <HowItWorksSection />
+      <LaunchesSection />
       <SpreadsheetsSection />
       <AccessibilitySection />
       <TestimonialsSection />
