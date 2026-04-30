@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Target, Plus, Trash2, Edit2, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { getAllLaunches } from "@/lib/dataStore";
 
 interface SavingsGoal {
   id: string;
@@ -55,27 +56,15 @@ export default function SavingsGoals() {
       }
     }
 
-    const storedLaunches = localStorage.getItem("lume_launches");
-    if (storedLaunches) {
-      try {
-        setLaunches(JSON.parse(storedLaunches));
-      } catch (e) {
-        console.error("Erro ao carregar lançamentos:", e);
-      }
-    }
+    const storedLaunches = getAllLaunches();
+    setLaunches(storedLaunches as Launch[]);
   }, []);
 
   // Sincronizar com eventos de lançamentos
   useEffect(() => {
     const handleLaunchesUpdate = () => {
-      const storedLaunches = localStorage.getItem("lume_launches");
-      if (storedLaunches) {
-        try {
-          setLaunches(JSON.parse(storedLaunches));
-        } catch (e) {
-          console.error("Erro ao sincronizar lançamentos:", e);
-        }
-      }
+      const storedLaunches = getAllLaunches();
+      setLaunches(storedLaunches as Launch[]);
     };
 
     window.addEventListener("lume_launches_updated", handleLaunchesUpdate);

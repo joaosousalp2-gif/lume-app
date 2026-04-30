@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Sparkles, TrendingUp, AlertCircle, CheckCircle, Zap } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { toast } from "sonner";
+import { getAllLaunches } from "@/lib/dataStore";
 
 interface Launch {
   id: string;
@@ -30,15 +31,20 @@ export default function AIAnalysis() {
   const [selectedPeriod, setSelectedPeriod] = useState<"7" | "30" | "90">("30");
 
   useEffect(() => {
-    // Carregar lançamentos do localStorage
-    const stored = localStorage.getItem("lume_launches");
-    if (stored) {
-      try {
-        setLaunches(JSON.parse(stored));
-      } catch (e) {
-        console.error("Erro ao carregar lançamentos:", e);
-      }
-    }
+    // Carregar lançamentos do dataStore centralizado
+    const storedLaunches = getAllLaunches();
+    setLaunches(storedLaunches as Launch[]);
+  }, []);
+
+  // Sincronizar com eventos de lançamentos
+  useEffect(() => {
+    const handleLaunchesUpdate = () => {
+      const storedLaunches = getAllLaunches();
+      setLaunches(storedLaunches as Launch[]);
+    };
+
+    window.addEventListener("lume_launches_updated", handleLaunchesUpdate);
+    return () => window.removeEventListener("lume_launches_updated", handleLaunchesUpdate);
   }, []);
 
   useEffect(() => {

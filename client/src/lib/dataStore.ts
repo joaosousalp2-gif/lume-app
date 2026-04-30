@@ -168,6 +168,28 @@ export function onDataChange(listener: DataChangeListener): () => void {
 function notifyListeners(): void {
   const data = calculateDerivedData();
   listeners.forEach((listener) => listener(data));
+  // Disparar evento global para sincronização entre componentes
+  window.dispatchEvent(new Event("lume_launches_updated"));
+}
+
+/**
+ * Inicializa listeners para sincronização com eventos do navegador
+ * Chamado uma vez quando o módulo é carregado
+ */
+export function initializeEventListeners(): void {
+  if (typeof window === "undefined") return;
+  
+  // Sincronizar quando o evento lume_launches_updated é disparado
+  window.addEventListener("lume_launches_updated", () => {
+    notifyListeners();
+  });
+  
+  // Sincronizar quando storage é alterado em outra aba
+  window.addEventListener("storage", (e) => {
+    if (e.key === "lume_launches") {
+      notifyListeners();
+    }
+  });
 }
 
 /**

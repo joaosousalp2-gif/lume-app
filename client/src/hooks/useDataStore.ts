@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { calculateDerivedData, onDataChange, type DerivedData } from "@/lib/dataStore";
+import { calculateDerivedData, onDataChange, initializeEventListeners, type DerivedData } from "@/lib/dataStore";
 
 /**
  * Hook que fornece dados derivados e sincroniza automaticamente com mudanças
@@ -14,6 +14,9 @@ export function useDataStore() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // Inicializar listeners globais (apenas uma vez)
+    initializeEventListeners();
+    
     // Registrar listener para mudanças
     const unsubscribe = onDataChange((newData) => {
       setData(newData);
