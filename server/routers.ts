@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch } from "./db";
+import { suggestCategory, getAvailableCategories } from "./_core/categorization";
 
 export const appRouter = router({
   system: systemRouter,
@@ -70,6 +71,17 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(({ input }) => deleteLaunch(input.id)),
+    suggestCategory: protectedProcedure
+      .input(z.object({
+        description: z.string(),
+        type: z.enum(["receita", "despesa"]),
+      }))
+      .mutation(({ input }) => suggestCategory(input.description, input.type)),
+    getCategories: publicProcedure
+      .input(z.object({
+        type: z.enum(["receita", "despesa"]),
+      }))
+      .query(({ input }) => getAvailableCategories(input.type)),
   }),
 });
 

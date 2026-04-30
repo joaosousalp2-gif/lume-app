@@ -5,8 +5,9 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { X, Plus, Minus, Calendar, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Plus, Minus, Calendar, Check, ChevronLeft, ChevronRight, Sparkles, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 interface LaunchModalsProps {
   isOpen: boolean;
@@ -24,6 +25,12 @@ interface Launch {
   recurrence: string;
   endDate: string;
   timestamp: number;
+}
+
+interface CategorySuggestion {
+  category: string;
+  confidence: number;
+  reasoning: string;
 }
 
 const categories = {
@@ -63,7 +70,12 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
     recurrence: "Única",
     endDate: "",
   });
+  const [categorySuggestion, setCategorySuggestion] = useState<CategorySuggestion | null>(null);
+  const [suggestingCategory, setSuggestingCategory] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
+  
+  // Mutation para sugerir categoria
+  const suggestCategoryMutation = trpc.launches.suggestCategory.useMutation();
 
   // Resetar estado quando modal abre/fecha ou tipo muda
   useEffect(() => {
@@ -147,6 +159,34 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
       }
     } else {
       setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSuggestCategory = async () => {
+    if (!formData.description.trim() || !type) {
+      toast.error("Descreva o lançamento para obter sugestão de categoria");
+      return;
+    }
+
+    setSuggestingCategory(true);
+    try {
+      const suggestion = await suggestCategoryMutation.mutateAsync({
+        description: formData.description,
+        type: type as "receita" | "despesa",
+      });
+      setCategorySuggestion(suggestion);
+    } catch (error) {
+      toast.error("Erro ao sugerir categoria. Tente novamente.");
+    } finally {
+      setSuggestingCategory(false);
+    }
+  };
+
+  const handleAcceptSuggestion = () => {
+    if (categorySuggestion) {
+      setFormData({ ...formData, category: categorySuggestion.category });
+      setCategorySuggestion(null);
+      toast.success(`Categoria "${categorySuggestion.category}" aplicada!`);
     }
   };
 
@@ -442,6 +482,49 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
               />
               <p className="text-xs text-gray-500 mt-1">{formData.description.length}/200</p>
             </div>
+
+            {/* AI Category Suggestion Button */}
+            {formData.description && !formData.category && (
+              <div className="p-4 rounded-xl bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
+                <button
+                  onClick={handleSuggestCategory}
+                  disabled={suggestingCategory}
+                  className="w-full py-3 rounded-lg font-bold text-white text-lg transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:shadow-lg disabled:opacity-50"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  {suggestingCategory ? "Sugerindo..." : "Sugerir Categoria com IA"}
+                </button>
+              </div>
+            )}
+
+            {/* Category Suggestion Result */}
+            {categorySuggestion && (
+              <div className="p-4 rounded-xl bg-green-50 border-2 border-green-300">
+                <div className="flex items-start gap-3 mb-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-green-800">Sugestão de IA</p>
+                    <p className="text-lg font-bold text-green-900 mt-1">{categorySuggestion.category}</p>
+                    <p className="text-xs text-green-700 mt-1">{categorySuggestion.reasoning}</p>
+                    <p className="text-xs text-green-600 mt-1">Confiança: {(categorySuggestion.confidence * 100).toFixed(0)}%</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAcceptSuggestion}
+                    className="flex-1 py-2 rounded-lg font-bold text-white bg-green-600 hover:bg-green-700 transition-all"
+                  >
+                    Aceitar
+                  </button>
+                  <button
+                    onClick={() => setCategorySuggestion(null)}
+                    className="flex-1 py-2 rounded-lg font-bold text-green-700 bg-white border-2 border-green-300 hover:bg-green-50 transition-all"
+                  >
+                    Rejeitar
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Recurrence */}
             <div>
