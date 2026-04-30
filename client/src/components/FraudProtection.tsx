@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect } from "react";
-import { AlertTriangle, Link2, BookOpen, Phone, Mail, CheckCircle, XCircle } from "lucide-react";
+import { AlertTriangle, Link2, BookOpen, Phone, Mail, CheckCircle, XCircle, Loader } from "lucide-react";
 import { toast } from "sonner";
+import { checkUrlSafety, getThreatInfo, type SafeBrowsingResult } from "@/lib/safeBrowsing";
 
 interface SuspiciousNumber {
   id: string;
@@ -96,12 +97,19 @@ export default function FraudProtection() {
   const [suspiciousNumbers, setSuspiciousNumbers] = useState<SuspiciousNumber[]>(SUSPICIOUS_NUMBERS);
   const [reportedNumbers, setReportedNumbers] = useState<string[]>([]);
   const [linkToCheck, setLinkToCheck] = useState("");
-  const [linkResult, setLinkResult] = useState<any>(null);
+  const [linkResult, setLinkResult] = useState<SafeBrowsingResult | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkHistory, setCheckHistory] = useState<SafeBrowsingResult[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("lume_reported_numbers");
     if (stored) {
       setReportedNumbers(JSON.parse(stored));
+    }
+    
+    const history = localStorage.getItem("lume_link_check_history");
+    if (history) {
+      setCheckHistory(JSON.parse(history));
     }
   }, []);
 
@@ -123,25 +131,34 @@ export default function FraudProtection() {
     toast.success("✅ Número reportado com sucesso!");
   };
 
-  const checkLink = () => {
-    if (!linkToCheck) {
+  const checkLink = async () => {
+    if (!linkToCheck.trim()) {
       toast.error("❌ Digite uma URL para verificar");
       return;
     }
 
-    // Simular verificação de link
-    const isSuspicious = linkToCheck.includes("phishing") || linkToCheck.includes("malware");
-    setLinkResult({
-      url: linkToCheck,
-      safe: !isSuspicious,
-      threat: isSuspicious ? "Possível phishing detectado" : "Link seguro",
-      timestamp: new Date().toLocaleString("pt-BR"),
-    });
+    setIsChecking(true);
+    try {
+      // Chamar o serviço Safe Browsing
+      const result = await checkUrlSafety(linkToCheck);
+      setLinkResult(result);
+      
+      // Adicionar ao histórico
+      setCheckHistory([result, ...checkHistory.slice(0, 9)]);
+      
+      // Salvar no localStorage
+      localStorage.setItem("lume_link_check_history", JSON.stringify([result, ...checkHistory.slice(0, 9)]));
 
-    if (isSuspicious) {
-      toast.error("⚠️ Link suspeito detectado!");
-    } else {
-      toast.success("✅ Link seguro!");
+      if (result.safe) {
+        toast.success("✅ Link seguro!");
+      } else {
+        toast.error(`⚠️ ${result.details}`);
+      }
+    } catch (error) {
+      toast.error("❌ Erro ao verificar URL");
+      console.error(error);
+    } finally {
+      setIsChecking(false);
     }
   };
 
@@ -259,9 +276,17 @@ export default function FraudProtection() {
                 />
                 <button
                   onClick={checkLink}
-                  className="px-6 py-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all whitespace-nowrap"
+                  disabled={isChecking}
+                  className="px-6 py-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  Verificar
+                  {isChecking ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Verificando...
+                    </>
+                  ) : (
+                    "Verificar"
+                  )}
                 </button>
               </div>
 
@@ -279,15 +304,47 @@ export default function FraudProtection() {
                     ) : (
                       <XCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
                     )}
-                    <div>
-                      <p className="font-bold text-gray-900 mb-2">{linkResult.threat}</p>
-                      <p className="text-sm text-gray-600 break-all mb-2">{linkResult.url}</p>
-                      <p className="text-xs text-gray-500">{linkResult.timestamp}</p>
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900 mb-2">
+                        {getThreatInfo(linkResult.threat).icon} {getThreatInfo(linkResult.threat).name}
+                      </p>
+                      <p className="text-sm text-gray-700 mb-2">{getThreatInfo(linkResult.threat).description}</p>
+                      <p className="text-xs text-gray-600 break-all mb-2">URL: {linkResult.url}</p>
+                      {linkResult.details && (
+                        <p className="text-xs text-gray-600 mb-2">Detalhes: {linkResult.details}</p>
+                      )}
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>Confiança: {linkResult.confidence}%</span>
+                        <span>•</span>
+                        <span>{linkResult.timestamp}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
+
+            {/* Histórico de Verificações */}
+            {checkHistory.length > 0 && (
+              <div className="p-6 rounded-xl bg-gray-50 border-2 border-gray-200">
+                <h4 className="font-bold text-gray-900 mb-3">📋 Histórico de Verificações</h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {checkHistory.map((item, index) => (
+                    <div key={index} className="p-3 rounded-lg bg-white border border-gray-200 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="break-all text-gray-700">{item.url}</span>
+                        {item.safe ? (
+                          <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{item.timestamp}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Dicas de Segurança */}
             <div className="p-6 rounded-xl bg-purple-50 border-2 border-purple-200">
