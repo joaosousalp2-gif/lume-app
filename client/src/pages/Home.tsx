@@ -12,6 +12,7 @@ import SecuritySection from "@/components/SecuritySection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import AccessibilitySection from "@/components/AccessibilitySection";
 import LaunchesSection from "@/components/LaunchesSection";
+import SavingsGoals from "@/components/SavingsGoals";
 import SpreadsheetsSection from "@/components/SpreadsheetsSection";
 import SecurityDashboard from "@/components/SecurityDashboard";
 import FraudProtection from "@/components/FraudProtection";
@@ -33,6 +34,7 @@ export default function Home() {
       <SecuritySection />
       <HowItWorksSection />
       <LaunchesSection />
+      <SavingsGoals />
       <CentralDashboard />
       <SpreadsheetsSection />
       <SecurityDashboard />

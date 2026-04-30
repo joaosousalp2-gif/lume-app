@@ -12,6 +12,7 @@ const navLinks = [
   { href: "#seguranca", label: "Segurança" },
   { href: "#como-funciona", label: "Como Funciona" },
   { href: "#lancamentos", label: "Lancamentos" },
+  { href: "#savings-goals", label: "Metas" },
   { href: "#central-dashboard", label: "Dashboard" },
   { href: "#planilhas", label: "Planilhas" },
   { href: "#fraud-protection", label: "Proteção" },
