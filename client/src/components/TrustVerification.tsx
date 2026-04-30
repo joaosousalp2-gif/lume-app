@@ -1,88 +1,23 @@
 import React, { useState } from "react";
 import { Search, CheckCircle, AlertTriangle, XCircle, TrendingUp, Users, Target } from "lucide-react";
 import { toast } from "sonner";
-
-interface CompanyReview {
-  name: string;
-  reputation: "excellent" | "good" | "regular" | "bad" | "notRecommended";
-  score: number;
-  resolutionIndex: number;
-  wouldDoBusiness: number;
-  complaints: string[];
-  status: "active" | "inactive";
-  lastUpdate: string;
-}
-
-const MOCK_COMPANIES: { [key: string]: CompanyReview } = {
-  "amazon.com.br": {
-    name: "Amazon Brasil",
-    reputation: "excellent",
-    score: 8.5,
-    resolutionIndex: 92,
-    wouldDoBusiness: 88,
-    complaints: ["Atraso na entrega", "Produto diferente do anúncio"],
-    status: "active",
-    lastUpdate: "2025-04-29",
-  },
-  "mercadolivre.com.br": {
-    name: "Mercado Livre",
-    reputation: "good",
-    score: 7.8,
-    resolutionIndex: 85,
-    wouldDoBusiness: 82,
-    complaints: ["Vendedor não responde", "Produto com defeito"],
-    status: "active",
-    lastUpdate: "2025-04-29",
-  },
-  "aliexpress.com": {
-    name: "AliExpress",
-    reputation: "regular",
-    score: 6.2,
-    resolutionIndex: 65,
-    wouldDoBusiness: 58,
-    complaints: ["Demora na entrega", "Qualidade inferior", "Dificuldade em reembolso"],
-    status: "active",
-    lastUpdate: "2025-04-28",
-  },
-  "exemplo-fraude.com": {
-    name: "Exemplo Fraude",
-    reputation: "notRecommended",
-    score: 1.5,
-    resolutionIndex: 5,
-    wouldDoBusiness: 2,
-    complaints: ["Fraude", "Roubo de dados", "Não entrega produto", "Não reembolsa"],
-    status: "inactive",
-    lastUpdate: "2025-04-20",
-  },
-};
+import { useTrustVerification } from "@/hooks/useTrustVerification";
 
 export default function TrustVerification() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState<CompanyReview | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
+  const { data, loading, error, searchCompany, clearData } = useTrustVerification();
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
       toast.error("Digite um nome ou URL para buscar");
       return;
     }
+    searchCompany(searchQuery);
+  };
 
-    setIsSearching(true);
-    setTimeout(() => {
-      const query = searchQuery.toLowerCase();
-      const company = Object.values(MOCK_COMPANIES).find(
-        (c) => c.name.toLowerCase().includes(query) || query.includes(c.name.toLowerCase())
-      );
-
-      if (company) {
-        setSelectedCompany(company);
-        toast.success(`Informações de ${company.name} carregadas!`);
-      } else {
-        toast.error("Empresa não encontrada no Reclame Aqui");
-        setSelectedCompany(null);
-      }
-      setIsSearching(false);
-    }, 1000);
+  const handleClear = () => {
+    setSearchQuery("");
+    clearData();
   };
 
   const getReputationColor = (reputation: string) => {
@@ -160,10 +95,10 @@ export default function TrustVerification() {
             />
             <button
               onClick={handleSearch}
-              disabled={isSearching}
+              disabled={loading}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-all font-semibold"
             >
-              {isSearching ? "Buscando..." : "Buscar"}
+              {loading ? "Buscando..." : "Buscar"}
             </button>
           </div>
           <p className="text-sm text-gray-500 mt-2">
@@ -171,20 +106,31 @@ export default function TrustVerification() {
           </p>
         </div>
 
+        {/* Mensagens de Status */}
+        {error && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-700">{error}</p>
+          </div>
+        )}
+
+        {loading && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+            <p className="text-sm text-blue-600 font-semibold">Buscando dados de confiabilidade...</p>
+          </div>
+        )}
+
         {/* Resultado da Busca */}
-        {selectedCompany && (
-          <div className={`p-8 rounded-xl border-2 ${getReputationColor(selectedCompany.reputation)}`}>
+        {data && !loading && (
+          <div className={`p-8 rounded-xl border-2 ${getReputationColor(data.reputation)}`}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Esquerda: Informações Principais */}
               <div>
                 <div className="flex items-center gap-4 mb-6">
-                  {getReputationIcon(selectedCompany.reputation)}
+                  {getReputationIcon(data.reputation)}
                   <div>
-                    <h3 className="text-3xl font-bold">{selectedCompany.name}</h3>
+                    <h3 className="text-3xl font-bold">{data.name}</h3>
                     <p className="text-sm mt-1">
-                      Status: <span className="font-semibold">
-                        {selectedCompany.status === "active" ? "✅ Ativa" : "❌ Desativada"}
-                      </span>
+                      Fonte: <span className="font-semibold">{data.source.toUpperCase()}</span>
                     </p>
                   </div>
                 </div>
@@ -194,7 +140,7 @@ export default function TrustVerification() {
                   <div className="bg-white bg-opacity-60 p-4 rounded-lg">
                     <p className="text-sm font-semibold text-gray-700 mb-2">Reputação Geral</p>
                     <p className="text-2xl font-bold">
-                      {getReputationLabel(selectedCompany.reputation)}
+                      {getReputationLabel(data.reputation)}
                     </p>
                   </div>
 
@@ -202,20 +148,28 @@ export default function TrustVerification() {
                   <div className="bg-white bg-opacity-60 p-4 rounded-lg">
                     <p className="text-sm font-semibold text-gray-700 mb-2">Nota do Consumidor</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-3xl font-bold">{selectedCompany.score.toFixed(1)}</p>
+                      <p className="text-3xl font-bold">{data.score.toFixed(1)}</p>
                       <p className="text-gray-600">/10</p>
                     </div>
                     <div className="w-full bg-gray-300 rounded-full h-2 mt-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${(selectedCompany.score / 10) * 100}%` }}
+                        className={`h-2 rounded-full ${
+                          data.score >= 8
+                            ? "bg-green-500"
+                            : data.score >= 6
+                            ? "bg-blue-600"
+                            : data.score >= 4
+                            ? "bg-yellow-500"
+                            : "bg-red-500"
+                        }`}
+                        style={{ width: `${(data.score / 10) * 100}%` }}
                       />
                     </div>
                   </div>
 
                   {/* Última Atualização */}
                   <p className="text-xs text-gray-600">
-                    Última atualização: {new Date(selectedCompany.lastUpdate).toLocaleDateString("pt-BR")}
+                    Última atualização: {data.lastUpdate}
                   </p>
                 </div>
               </div>
@@ -230,7 +184,7 @@ export default function TrustVerification() {
                       Índice de Solução
                     </p>
                     <span className="text-2xl font-bold text-green-600">
-                      {selectedCompany.resolutionIndex}%
+                      {data.resolutionIndex}%
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
@@ -239,7 +193,7 @@ export default function TrustVerification() {
                   <div className="w-full bg-gray-300 rounded-full h-3 mt-3">
                     <div
                       className="bg-green-500 h-3 rounded-full"
-                      style={{ width: `${selectedCompany.resolutionIndex}%` }}
+                      style={{ width: `${data.resolutionIndex}%` }}
                     />
                   </div>
                 </div>
@@ -252,7 +206,7 @@ export default function TrustVerification() {
                       Voltaria a Fazer Negócio
                     </p>
                     <span className="text-2xl font-bold text-purple-600">
-                      {selectedCompany.wouldDoBusiness}%
+                      {data.wouldDoBusiness}%
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
@@ -261,7 +215,7 @@ export default function TrustVerification() {
                   <div className="w-full bg-gray-300 rounded-full h-3 mt-3">
                     <div
                       className="bg-purple-500 h-3 rounded-full"
-                      style={{ width: `${selectedCompany.wouldDoBusiness}%` }}
+                      style={{ width: `${data.wouldDoBusiness}%` }}
                     />
                   </div>
                 </div>
@@ -273,7 +227,7 @@ export default function TrustVerification() {
                     Principais Reclamações
                   </p>
                   <ul className="space-y-2">
-                    {selectedCompany.complaints.map((complaint, idx) => (
+                    {data.complaints.map((complaint, idx) => (
                       <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
                         <span className="text-red-500 mt-1">•</span>
                         {complaint}
@@ -287,59 +241,38 @@ export default function TrustVerification() {
             {/* Recomendação Final */}
             <div className="mt-8 p-6 bg-white bg-opacity-80 rounded-lg border-l-4 border-blue-600">
               <p className="font-bold text-gray-900 mb-2">💡 Recomendação:</p>
-              {selectedCompany.reputation === "excellent" || selectedCompany.reputation === "good" ? (
+              {data.reputation === "excellent" || data.reputation === "good" ? (
                 <p className="text-green-700">
                   ✅ Esta empresa tem boa reputação. É seguro fazer negócios, mas sempre fique atento aos termos e condições.
                 </p>
-              ) : selectedCompany.reputation === "regular" ? (
+              ) : data.reputation === "regular" ? (
                 <p className="text-yellow-700">
-                  ⚠️ Esta empresa tem reputação regular. Proceda com cautela e verifique bem antes de fazer transações.
+                  ⚠️ Esta empresa tem reputação regular. Proceda com cautela e verifique bem antes de fazer negócios.
                 </p>
               ) : (
                 <p className="text-red-700">
-                  ❌ Esta empresa tem reputação ruim ou não é recomendada. Evite fazer negócios ou procure alternativas.
+                  ❌ Esta empresa NÃO é recomendada. Evite fazer negócios com ela. Se já teve problemas, reporte no Reclame Aqui.
                 </p>
               )}
+            </div>
+
+            {/* Botão Limpar */}
+            <div className="mt-6">
+              <button
+                onClick={handleClear}
+                className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+              >
+                Limpar Busca
+              </button>
             </div>
           </div>
         )}
 
-        {/* Empresas Sugeridas */}
-        {!selectedCompany && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Object.values(MOCK_COMPANIES).map((company) => (
-              <button
-                key={company.name}
-                onClick={() => {
-                  setSelectedCompany(company);
-                  setSearchQuery(company.name);
-                }}
-                className={`p-4 rounded-lg border-2 text-left transition-all hover:shadow-lg ${getReputationColor(company.reputation)}`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {getReputationIcon(company.reputation)}
-                  <h4 className="font-bold">{company.name}</h4>
-                </div>
-                <p className="text-sm mb-2">Nota: {company.score.toFixed(1)}/10</p>
-                <p className="text-xs">
-                  {getReputationLabel(company.reputation)}
-                </p>
-              </button>
-            ))}
+        {!data && !loading && searchQuery && (
+          <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
+            <p className="text-gray-600">Nenhuma empresa encontrada. Tente outro nome.</p>
           </div>
         )}
-
-        {/* Informações Adicionais */}
-        <div className="mt-12 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-bold text-gray-900 mb-3">ℹ️ Como usar o Verificador:</h3>
-          <ul className="space-y-2 text-sm text-gray-700">
-            <li>✓ Digite o nome da empresa ou URL na barra de busca</li>
-            <li>✓ Verifique a reputação geral e nota do consumidor</li>
-            <li>✓ Analise o índice de solução e percentual de recomendação</li>
-            <li>✓ Leia as principais reclamações para identificar problemas comuns</li>
-            <li>✓ Use as recomendações para tomar decisões informadas</li>
-          </ul>
-        </div>
       </div>
     </section>
   );
