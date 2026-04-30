@@ -12,6 +12,7 @@ const navLinks = [
   { href: "#seguranca", label: "Segurança" },
   { href: "#como-funciona", label: "Como Funciona" },
   { href: "#lancamentos", label: "Lançamentos" },
+  { href: "#metas", label: "Metas" },
   { href: "#planilhas", label: "Planilhas" },
   { href: "#depoimentos", label: "Depoimentos" },
   { href: "#download", label: "Baixar App" },
