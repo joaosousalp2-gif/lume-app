@@ -119,22 +119,69 @@ function CalendarDay({ day, hasReceita, hasDespesa, isToday, isSelected, onClick
   );
 }
 
+interface Launch {
+  id: string;
+  type: "receita" | "despesa";
+  date: string;
+  category: string;
+  value: string;
+  description: string;
+  recurrence: string;
+  endDate: string;
+  timestamp: number;
+}
+
 export default function LaunchesSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"today" | "future" | "history" | "tracking">("today");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"receita" | "despesa" | null>(null);
+  const [launches, setLaunches] = useState<Launch[]>([]);
+
+  // Carregar lançamentos do localStorage
+  useEffect(() => {
+    const loadLaunches = () => {
+      try {
+        const data = localStorage.getItem("lume_launches");
+        if (data) {
+          setLaunches(JSON.parse(data));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar lançamentos:", error);
+      }
+    };
+    loadLaunches();
+
+    // Atualizar quando o modal fecha (para refletir novos lançamentos)
+    const handleStorageChange = () => {
+      loadLaunches();
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Recarregar lançamentos quando o modal fecha
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalType(null);
+    // Recarregar lançamentos
+    try {
+      const data = localStorage.getItem("lume_launches");
+      if (data) {
+        setLaunches(JSON.parse(data));
+      }
+    } catch (error) {
+      console.error("Erro ao carregar lançamentos:", error);
+    }
+  };
 
   const openModal = (type: "receita" | "despesa") => {
     setModalType(type);
     setModalOpen(true);
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    setModalType(null);
-  };
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(

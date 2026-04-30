@@ -1,11 +1,12 @@
 /*
  * LaunchModals — Lume
  * Componentes modais para fluxo de lançamentos (receita/despesa)
- * Inclui: seleção de período, calendário, formulário de entrada
+ * Inclui: seleção de período, calendário, formulário de entrada, toast, localStorage, atalhos
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Plus, Minus, Calendar, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 interface LaunchModalsProps {
   isOpen: boolean;
@@ -13,9 +14,41 @@ interface LaunchModalsProps {
   onClose: () => void;
 }
 
+interface Launch {
+  id: string;
+  type: "receita" | "despesa";
+  date: string;
+  category: string;
+  value: string;
+  description: string;
+  recurrence: string;
+  endDate: string;
+  timestamp: number;
+}
+
 const categories = {
   receita: ["Pensão", "Salário", "Aluguel de Imóvel", "Venda de Itens", "Outros"],
   despesa: ["Saúde", "Alimentação", "Moradia", "Lazer", "Transportes", "Educação", "Utilidades", "Outros"],
+};
+
+// Funções de localStorage
+const getLaunches = (): Launch[] => {
+  try {
+    const data = localStorage.getItem("lume_launches");
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveLaunch = (launch: Launch) => {
+  try {
+    const launches = getLaunches();
+    launches.push(launch);
+    localStorage.setItem("lume_launches", JSON.stringify(launches));
+  } catch (error) {
+    console.error("Erro ao salvar lançamento:", error);
+  }
 };
 
 export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProps) {
@@ -30,6 +63,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
     recurrence: "Única",
     endDate: "",
   });
+  const formRef = useRef<HTMLDivElement>(null);
 
   // Resetar estado quando modal abre/fecha ou tipo muda
   useEffect(() => {
@@ -47,6 +81,25 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
       });
     }
   }, [isOpen, type]);
+
+  // Atalhos de teclado
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape para fechar
+      if (e.key === "Escape") {
+        onClose();
+      }
+      // Enter para "Salvar e Adicionar Outro" quando no formulário
+      if (e.key === "Enter" && step === "form" && e.ctrlKey) {
+        handleSubmit();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, step, formData]);
 
   const isReceita = type === "receita";
   const bgColor = isReceita ? "#22C55E" : "#EF4444";
@@ -98,8 +151,28 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
   };
 
   const handleSubmit = () => {
-    if (formData.category && formData.value) {
-      console.log("Lançamento registrado:", { type, selectedDate, ...formData });
+    if (formData.category && formData.value && selectedDate) {
+      const launch: Launch = {
+        id: `${Date.now()}-${Math.random()}`,
+        type: type as "receita" | "despesa",
+        date: selectedDate.toISOString().split("T")[0],
+        category: formData.category,
+        value: formData.value,
+        description: formData.description,
+        recurrence: formData.recurrence,
+        endDate: formData.endDate,
+        timestamp: Date.now(),
+      };
+
+      saveLaunch(launch);
+
+      // Toast de sucesso
+      const tipoLabel = isReceita ? "Receita" : "Despesa";
+      toast.success(`✅ ${tipoLabel} de R$ ${formData.value} registrada com sucesso!`, {
+        description: `${formData.category} em ${selectedDate.toLocaleDateString("pt-BR")}`,
+        duration: 3000,
+      });
+
       // Reset form for next entry
       setFormData({
         category: "",
@@ -114,8 +187,28 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
   };
 
   const handleSubmitAndClose = () => {
-    if (formData.category && formData.value) {
-      console.log("Lançamento registrado:", { type, selectedDate, ...formData });
+    if (formData.category && formData.value && selectedDate) {
+      const launch: Launch = {
+        id: `${Date.now()}-${Math.random()}`,
+        type: type as "receita" | "despesa",
+        date: selectedDate.toISOString().split("T")[0],
+        category: formData.category,
+        value: formData.value,
+        description: formData.description,
+        recurrence: formData.recurrence,
+        endDate: formData.endDate,
+        timestamp: Date.now(),
+      };
+
+      saveLaunch(launch);
+
+      // Toast de sucesso
+      const tipoLabel = isReceita ? "Receita" : "Despesa";
+      toast.success(`✅ ${tipoLabel} de R$ ${formData.value} registrada com sucesso!`, {
+        description: `${formData.category} em ${selectedDate.toLocaleDateString("pt-BR")}`,
+        duration: 3000,
+      });
+
       // Reset and close
       onClose();
     }
@@ -125,7 +218,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50 animate-in fade-in">
-      <div className="w-full bg-white rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom">
+      <div className="w-full bg-white rounded-t-3xl p-6 max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom" ref={formRef}>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-black text-gray-900" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -134,10 +227,17 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
             {step === "calendar" && "📆 Selecione a data"}
             {step === "form" && "📝 Preencha os dados"}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-all">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-all" title="Fechar (ESC)">
             <X className="w-6 h-6" />
           </button>
         </div>
+
+        {/* Atalhos de teclado - Dica */}
+        {step === "form" && (
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-sm text-blue-700">
+            💡 <strong>Atalhos:</strong> Ctrl+Enter para salvar e adicionar outro | ESC para fechar
+          </div>
+        )}
 
         {/* STEP: MAIN - Choose Receipt/Expense */}
         {step === "main" && (
@@ -377,6 +477,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
                   backgroundColor: formData.category && formData.value ? bgColor : "#D1D5DB",
                   opacity: formData.category && formData.value ? 1 : 0.5,
                 }}
+                title="Ctrl+Enter"
               >
                 <Check className="w-6 h-6" />
                 Salvar e Adicionar Outro
@@ -396,6 +497,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
               <button
                 onClick={onClose}
                 className="w-full py-4 rounded-xl font-bold text-white text-lg bg-gray-600 hover:bg-gray-700 transition-all"
+                title="Escape"
               >
                 Cancelar
               </button>
