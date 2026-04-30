@@ -71,15 +71,16 @@ export default function AIAnalysis() {
     // Identificar categorias com alto gasto
     Object.entries(categoryTotals).forEach(([category, total]) => {
       const count = categoryCount[category];
-      const average = total / count;
+      const numTotal = typeof total === 'number' ? total : parseFloat(total as any) || 0;
+      const average = numTotal / count;
 
-      if (total > 500) {
+      if (numTotal > 500) {
         newInsights.push({
           id: `high-${category}`,
           type: "warning",
           title: `Alto gasto em ${category}`,
-          description: `Você gastou R$ ${total.toFixed(2)} em ${category} nos últimos ${days} dias (${count} transações). Considere revisar essas despesas.`,
-          potentialSavings: total * 0.1,
+          description: `Você gastou R$ ${numTotal.toFixed(2)} em ${category} nos últimos ${days} dias (${count} transações). Considere revisar essas despesas.`,
+          potentialSavings: numTotal * 0.1,
           icon: <AlertCircle className="w-5 h-5 text-orange-500" />,
         });
       }
@@ -88,11 +89,11 @@ export default function AIAnalysis() {
     // Análise 2: Oportunidades de Economia
     const totalDespesas = filteredLaunches
       .filter((l) => l.type === "despesa")
-      .reduce((sum, l) => sum + l.value, 0);
+      .reduce((sum, l) => sum + (typeof l.value === 'number' ? l.value : parseFloat(l.value as any) || 0), 0);
 
     const totalReceitas = filteredLaunches
       .filter((l) => l.type === "receita")
-      .reduce((sum, l) => sum + l.value, 0);
+      .reduce((sum, l) => sum + (typeof l.value === 'number' ? l.value : parseFloat(l.value as any) || 0), 0);
 
     if (totalReceitas > 0) {
       const savingsRate = ((totalReceitas - totalDespesas) / totalReceitas) * 100;
@@ -118,11 +119,14 @@ export default function AIAnalysis() {
     }
 
     // Análise 3: Despesas por Categoria
-    const categoryData = Object.entries(categoryTotals).map(([category, total]) => ({
-      name: category,
-      value: total,
-      percentage: ((total / totalDespesas) * 100).toFixed(1),
-    }));
+    const categoryData = Object.entries(categoryTotals).map(([category, total]) => {
+      const numTotal = typeof total === 'number' ? total : parseFloat(total as any) || 0;
+      return {
+        name: category,
+        value: numTotal,
+        percentage: totalDespesas > 0 ? ((numTotal / totalDespesas) * 100).toFixed(1) : '0',
+      };
+    });
 
     setCategoryAnalysis(categoryData);
 
@@ -131,7 +135,8 @@ export default function AIAnalysis() {
     filteredLaunches.forEach((l) => {
       const date = new Date(l.date).toLocaleDateString("pt-BR");
       if (l.type === "despesa") {
-        trendData[date] = (trendData[date] || 0) + l.value;
+        const numValue = typeof l.value === 'number' ? l.value : parseFloat(l.value as any) || 0;
+        trendData[date] = (trendData[date] || 0) + numValue;
       }
     });
 
@@ -142,24 +147,28 @@ export default function AIAnalysis() {
     setTrends(sortedTrends);
 
     // Análise 5: Sugestões Automáticas
-    if (categoryTotals["Alimentação"] > 300) {
+    const alimentacao = categoryTotals["Alimentação"] || 0;
+    const numAlimentacao = typeof alimentacao === 'number' ? alimentacao : parseFloat(alimentacao as any) || 0;
+    if (numAlimentacao > 300) {
       newInsights.push({
         id: "food-suggestion",
         type: "suggestion",
         title: "Otimizar gastos com alimentação",
         description: "Considere preparar refeições em casa ou usar aplicativos de cashback para economizar em alimentação.",
-        potentialSavings: categoryTotals["Alimentação"] * 0.15,
+        potentialSavings: numAlimentacao * 0.15,
         icon: <Zap className="w-5 h-5 text-yellow-500" />,
       });
     }
 
-    if (categoryTotals["Transporte"] > 200) {
+    const transporte = categoryTotals["Transporte"] || 0;
+    const numTransporte = typeof transporte === 'number' ? transporte : parseFloat(transporte as any) || 0;
+    if (numTransporte > 200) {
       newInsights.push({
         id: "transport-suggestion",
         type: "suggestion",
         title: "Reduzir gastos com transporte",
         description: "Explore opções como carona compartilhada, transporte público ou bicicleta para economizar.",
-        potentialSavings: categoryTotals["Transporte"] * 0.2,
+        potentialSavings: numTransporte * 0.2,
         icon: <Zap className="w-5 h-5 text-yellow-500" />,
       });
     }
@@ -288,7 +297,13 @@ export default function AIAnalysis() {
             <div>
               <p className="text-purple-100 text-sm mb-1">Economia Potencial</p>
               <p className="text-3xl font-bold">
-                R$ {insights.reduce((sum, i) => sum + (i.potentialSavings || 0), 0).toFixed(2)}
+                R$ {(() => {
+                  const total = insights.reduce((sum, i) => {
+                    const savings = i.potentialSavings || 0;
+                    return sum + (typeof savings === 'number' ? savings : parseFloat(savings as any) || 0);
+                  }, 0);
+                  return typeof total === 'number' ? total.toFixed(2) : '0.00';
+                })()}
               </p>
             </div>
             <div>
