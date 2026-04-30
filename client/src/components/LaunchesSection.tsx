@@ -9,17 +9,19 @@ import { Calendar, Plus, TrendingUp, TrendingDown, BarChart3, PieChart, Trash2, 
 import LaunchModals from "./LaunchModals";
 import { BarChart, Bar, PieChart as RechartsPie, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { toast } from "sonner";
+import { getAllLaunches, calculateDerivedData, deleteLaunch, onDataChange, exportToCSV, type DerivedData } from "@/lib/dataStore";
 
 interface Launch {
   id: string;
   type: "receita" | "despesa";
   date: string;
   category: string;
-  value: string;
+  value: number;
   description: string;
-  recurrence: string;
-  endDate: string;
-  timestamp: number;
+  recurrence?: string;
+  endDate?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const currentDate = new Date(2025, 3, 29); // 29 de abril de 2025
@@ -192,10 +194,10 @@ export default function LaunchesSection() {
   const calculateSummary = (launchList: Launch[]) => {
     const receitas = launchList
       .filter(l => l.type === "receita")
-      .reduce((sum, l) => sum + parseFloat(l.value), 0);
+      .reduce((sum, l) => sum + (typeof l.value === 'string' ? parseFloat(l.value) : l.value), 0);
     const despesas = launchList
       .filter(l => l.type === "despesa")
-      .reduce((sum, l) => sum + parseFloat(l.value), 0);
+      .reduce((sum, l) => sum + (typeof l.value === 'string' ? parseFloat(l.value) : l.value), 0);
     return { receitas, despesas, saldo: receitas - despesas };
   };
 
@@ -206,7 +208,8 @@ export default function LaunchesSection() {
     // Criar conteúdo CSV
     let csvContent = "Data,Tipo,Categoria,Descrição,Valor\n";
     launches.forEach(l => {
-      csvContent += `${l.date},${l.type === "receita" ? "Receita" : "Despesa"},${l.category},"${l.description}",R$ ${parseFloat(l.value).toFixed(2)}\n`;
+      const val = typeof l.value === 'string' ? parseFloat(l.value) : l.value;
+      csvContent += `${l.date},${l.type === "receita" ? "Receita" : "Despesa"},${l.category},"${l.description}",R$ ${val.toFixed(2)}\n`;
     });
     
     // Adicionar resumo
@@ -510,7 +513,7 @@ export default function LaunchesSection() {
                       <RechartsPie data={
                         Object.entries(
                           launches.reduce((acc: any, l) => {
-                            const value = parseFloat(l.value);
+                            const value = typeof l.value === 'string' ? parseFloat(l.value) : l.value;
                             acc[l.category] = (acc[l.category] || 0) + value;
                             return acc;
                           }, {})
@@ -519,7 +522,7 @@ export default function LaunchesSection() {
                         <Pie dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                           {Object.entries(
                             launches.reduce((acc: any, l) => {
-                              const value = parseFloat(l.value);
+                              const value = typeof l.value === 'string' ? parseFloat(l.value) : l.value;
                               acc[l.category] = (acc[l.category] || 0) + value;
                               return acc;
                             }, {})
