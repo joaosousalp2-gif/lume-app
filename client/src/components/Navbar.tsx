@@ -18,6 +18,9 @@ const navLinks = [
   { href: "#budgets", label: "Orçamento" },
   { href: "#trends", label: "Tendências" },
   { href: "#fraud-protection", label: "Proteção" },
+  { href: "#ai-analysis", label: "IA" },
+  { href: "#trust-verification", label: "Confiabilidade" },
+  { href: "#trust-integration", label: "Monitoramento" },
   { href: "#depoimentos", label: "Depoimentos" },
   { href: "#download", label: "Baixar App" },
 ];

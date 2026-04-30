@@ -19,6 +19,9 @@ import BudgetManager from "@/components/BudgetManager";
 import TrendsAndInflation from "@/components/TrendsAndInflation";
 import FraudProtection from "@/components/FraudProtection";
 import CentralDashboard from "@/components/CentralDashboard";
+import AIAnalysis from "@/components/AIAnalysis";
+import TrustVerification from "@/components/TrustVerification";
+import TrustIntegration from "@/components/TrustIntegration";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import DownloadSection from "@/components/DownloadSection";
 import Footer from "@/components/Footer";
@@ -38,8 +41,10 @@ export default function Home() {
       <SecurityDashboard />
       <BudgetManager />
       <TrendsAndInflation />
-      <FraudProtection />
-      <AccessibilitySection />
+       <FraudProtection />
+      <AIAnalysis />
+      <TrustVerification />
+      <TrustIntegration />
       <TestimonialsSection />
       <DownloadSection />
       <Footer />
