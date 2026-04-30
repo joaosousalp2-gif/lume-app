@@ -15,6 +15,9 @@ import LaunchesSection from "@/components/LaunchesSection";
 import GoalsSection from "@/components/GoalsSection";
 import SpreadsheetsSection from "@/components/SpreadsheetsSection";
 import SecurityDashboard from "@/components/SecurityDashboard";
+import BudgetManager from "@/components/BudgetManager";
+import TrendsAndInflation from "@/components/TrendsAndInflation";
+import FraudProtection from "@/components/FraudProtection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import DownloadSection from "@/components/DownloadSection";
 import Footer from "@/components/Footer";
@@ -31,6 +34,9 @@ export default function Home() {
       <GoalsSection />
       <SpreadsheetsSection />
       <SecurityDashboard />
+      <BudgetManager />
+      <TrendsAndInflation />
+      <FraudProtection />
       <AccessibilitySection />
       <TestimonialsSection />
       <DownloadSection />
