@@ -123,6 +123,23 @@
 }
 
 @layer components {
+  /* Estilos Compactos para Lume */
+  section {
+    @apply py-8 md:py-10;
+  }
+
+  section > div:first-child {
+    @apply mb-6 md:mb-8;
+  }
+
+  section h2 {
+    @apply text-3xl md:text-4xl mb-2;
+  }
+
+  section > div:first-child > p {
+    @apply text-sm md:text-base;
+  }
+
   .container {
     width: 100%;
     margin-left: auto;

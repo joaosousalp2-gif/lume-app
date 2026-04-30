@@ -12,11 +12,8 @@ import SecuritySection from "@/components/SecuritySection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import AccessibilitySection from "@/components/AccessibilitySection";
 import LaunchesSection from "@/components/LaunchesSection";
-import GoalsSection from "@/components/GoalsSection";
 import SpreadsheetsSection from "@/components/SpreadsheetsSection";
 import SecurityDashboard from "@/components/SecurityDashboard";
-import BudgetManager from "@/components/BudgetManager";
-import TrendsAndInflation from "@/components/TrendsAndInflation";
 import FraudProtection from "@/components/FraudProtection";
 import CentralDashboard from "@/components/CentralDashboard";
 import AIAnalysis from "@/components/AIAnalysis";
@@ -36,16 +33,12 @@ export default function Home() {
       <HowItWorksSection />
       <LaunchesSection />
       <CentralDashboard />
-      <GoalsSection />
       <SpreadsheetsSection />
       <SecurityDashboard />
-      <BudgetManager />
-      <TrendsAndInflation />
-       <FraudProtection />
+      <FraudProtection />
       <AIAnalysis />
       <TrustVerification />
       <TrustIntegration />
-      <TestimonialsSection />
       <DownloadSection />
       <Footer />
     </div>

@@ -93,11 +93,11 @@ export default function SpreadsheetsSection() {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
 
-  // Carregar lançamentos do localStorage
+  // Carregar lançamentos do localStorage e sincronizar em tempo real
   useEffect(() => {
     const loadLaunches = () => {
       try {
-        const data = localStorage.getItem("lume_launches");
+        const data = localStorage.getItem("launches");
         if (data) {
           setLaunches(JSON.parse(data));
         }
@@ -108,11 +108,16 @@ export default function SpreadsheetsSection() {
 
     loadLaunches();
 
-    const handleStorageChange = () => {
-      loadLaunches();
-    };
+    const handleStorageChange = () => loadLaunches();
+    const handleLaunchesUpdated = () => loadLaunches();
+    
     window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener("launchesUpdated", handleLaunchesUpdated);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("launchesUpdated", handleLaunchesUpdated);
+    };
   }, []);
 
   // Processar dados quando lançamentos mudam
@@ -122,7 +127,11 @@ export default function SpreadsheetsSection() {
 
   // Processar dados de lançamentos
   const processLaunchesData = () => {
-    if (launches.length === 0) return;
+    if (!launches || launches.length === 0) {
+      setMonthlyData([]);
+      setCategoryData([]);
+      return;
+    }
 
     // Agrupar por mês
     const monthlyMap: { [key: string]: { receitas: number; despesas: number } } = {};
