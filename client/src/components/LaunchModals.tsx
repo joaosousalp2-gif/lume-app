@@ -165,6 +165,9 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
       };
 
       saveLaunch(launch);
+      
+      // Disparar evento de atualização
+      window.dispatchEvent(new Event('lume_launches_updated'));
 
       // Toast de sucesso
       const tipoLabel = isReceita ? "Receita" : "Despesa";
@@ -201,6 +204,9 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
       };
 
       saveLaunch(launch);
+      
+      // Disparar evento de atualização
+      window.dispatchEvent(new Event('lume_launches_updated'));
 
       // Toast de sucesso
       const tipoLabel = isReceita ? "Receita" : "Despesa";

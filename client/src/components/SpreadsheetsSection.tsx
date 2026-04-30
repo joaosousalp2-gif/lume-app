@@ -97,7 +97,7 @@ export default function SpreadsheetsSection() {
   useEffect(() => {
     const loadLaunches = () => {
       try {
-        const data = localStorage.getItem("launches");
+        const data = localStorage.getItem("lume_launches");
         if (data) {
           setLaunches(JSON.parse(data));
         }
@@ -112,11 +112,11 @@ export default function SpreadsheetsSection() {
     const handleLaunchesUpdated = () => loadLaunches();
     
     window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("launchesUpdated", handleLaunchesUpdated);
+    window.addEventListener("lume_launches_updated", handleLaunchesUpdated);
     
     return () => {
       window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("launchesUpdated", handleLaunchesUpdated);
+      window.removeEventListener("lume_launches_updated", handleLaunchesUpdated);
     };
   }, []);
 

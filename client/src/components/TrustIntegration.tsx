@@ -46,7 +46,7 @@ export default function TrustIntegration() {
 
   useEffect(() => {
     // Carregar lançamentos do localStorage
-    const stored = localStorage.getItem("launches");
+    const stored = localStorage.getItem("lume_launches");
     if (stored) {
       try {
         setLaunches(JSON.parse(stored));

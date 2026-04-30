@@ -18,6 +18,27 @@ export const appRouter = router({
     }),
   }),
 
+  trust: router({
+    verify: publicProcedure
+      .input(z.object({ company: z.string() }))
+      .query(({ input }) => ({
+        success: true,
+        data: {
+          company: input.company,
+          reputation: "Bom",
+          score: 7.5,
+          resolutionIndex: 85,
+          wouldReturnPercentage: 72,
+          complaints: [
+            { category: "Entrega", count: 12 },
+            { category: "Qualidade", count: 8 },
+            { category: "Atendimento", count: 5 },
+          ],
+          status: "Ativa",
+        },
+      })),
+  }),
+
   launches: router({
     list: protectedProcedure.query(({ ctx }) => getLaunchesByUserId(ctx.user.id)),
     create: protectedProcedure
