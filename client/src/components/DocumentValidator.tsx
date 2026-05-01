@@ -6,7 +6,6 @@
 
 import { useState } from "react";
 import { CheckCircle, AlertCircle, Loader2, Shield } from "lucide-react";
-import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -24,8 +23,6 @@ export default function DocumentValidator() {
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
-  // Queries para validação (não usadas diretamente, apenas para tipo)
-
   const handleValidate = async () => {
     if (!document.trim()) {
       toast.error("Por favor, insira um documento");
@@ -35,30 +32,49 @@ export default function DocumentValidator() {
     setIsValidating(true);
     try {
       if (documentType === "cpf") {
-        // Usar fetch direto para queries públicas
-        const response = await fetch("/api/trpc/publicData.validateCPF?input=" + encodeURIComponent(JSON.stringify({ cpf: document })));
+        const response = await fetch(
+          "/api/trpc/publicData.validateCPF?input=" +
+            encodeURIComponent(JSON.stringify({ cpf: document }))
+        );
         const data = await response.json();
-        const result = data.result.data;
+
+        // tRPC retorna { result: { data: {...} } }
+        const validationResult = data.result?.data || data.result;
+        if (!validationResult) {
+          throw new Error("Resposta inválida da API");
+        }
+
         setResult({
           type: "cpf",
-          document: result.cpf,
-          isValid: result.isValid,
+          document: validationResult.cpf,
+          isValid: validationResult.isValid,
         });
-        if (result.isValid) {
+
+        if (validationResult.isValid) {
           toast.success("CPF válido!");
         } else {
           toast.error("Documento inválido");
         }
       } else {
-        const response = await fetch("/api/trpc/publicData.validateCNPJ?input=" + encodeURIComponent(JSON.stringify({ cnpj: document })));
+        const response = await fetch(
+          "/api/trpc/publicData.validateCNPJ?input=" +
+            encodeURIComponent(JSON.stringify({ cnpj: document }))
+        );
         const data = await response.json();
-        const result = data.result.data;
+
+        // tRPC retorna { result: { data: {...} } }
+        const validationResult = data.result?.data || data.result;
+        if (!validationResult) {
+          throw new Error("Resposta inválida da API");
+        }
+
         setResult({
           type: "cnpj",
-          document: result.cnpj,
-          isValid: result.isValid,
+          document: validationResult.cnpj,
+          isValid: validationResult.isValid,
         });
-        if (result.isValid) {
+
+        if (validationResult.isValid) {
           toast.success("CNPJ válido!");
         } else {
           toast.error("Documento inválido");
