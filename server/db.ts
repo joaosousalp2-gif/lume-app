@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -187,4 +187,99 @@ export async function incrementRuleUsage(ruleId: number) {
       .set({ timesApplied: (rule[0].timesApplied || 0) + 1 })
       .where(eq(categorizationRules.id, ruleId));
   }
+}
+
+// ===== Bank Accounts Helpers =====
+
+export async function getBankAccountsByUserId(userId: number): Promise<BankAccount[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(bankAccounts)
+    .where(and(eq(bankAccounts.userId, userId), eq(bankAccounts.isActive, 1)))
+    .orderBy(bankAccounts.displayOrder);
+}
+
+export async function createBankAccount(account: typeof bankAccounts.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(bankAccounts).values(account);
+  return result;
+}
+
+export async function updateBankAccount(id: number, data: Partial<typeof bankAccounts.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.update(bankAccounts).set(data).where(eq(bankAccounts.id, id));
+}
+
+export async function deleteBankAccount(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.update(bankAccounts).set({ isActive: 0 }).where(eq(bankAccounts.id, id));
+}
+
+export async function getTotalBalance(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) return "0";
+
+  const accounts = await getBankAccountsByUserId(userId);
+  const total = accounts.reduce((sum, account) => {
+    const balance = parseFloat(account.balance) || 0;
+    return sum + balance;
+  }, 0);
+
+  return total.toFixed(2);
+}
+
+// ===== Budget Helpers =====
+
+export async function getBudgetsByUserAndMonth(userId: number, month: string): Promise<Budget[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(budgets)
+    .where(and(eq(budgets.userId, userId), eq(budgets.month, month)));
+}
+
+export async function createBudget(budget: typeof budgets.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(budgets).values(budget);
+  return result;
+}
+
+export async function updateBudget(id: number, data: Partial<typeof budgets.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.update(budgets).set(data).where(eq(budgets.id, id));
+}
+
+export async function deleteBudget(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.delete(budgets).where(eq(budgets.id, id));
+}
+
+export async function getBudgetForCategory(userId: number, category: string, month: string): Promise<Budget | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(budgets)
+    .where(and(eq(budgets.userId, userId), eq(budgets.category, category), eq(budgets.month, month)))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
 }

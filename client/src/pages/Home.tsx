@@ -18,6 +18,8 @@ import SecurityDashboard from "@/components/SecurityDashboard";
 import FraudProtection from "@/components/FraudProtection";
 import CentralDashboard from "@/components/CentralDashboard";
 import AIAnalysis from "@/components/AIAnalysis";
+import BankAccountsSection from "@/components/BankAccountsSection";
+import BudgetSection from "@/components/BudgetSection";
 import TrustVerification from "@/components/TrustVerification";
 import TrustIntegration from "@/components/TrustIntegration";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -36,6 +38,8 @@ export default function Home() {
       <LaunchesSection />
       <SavingsGoals />
       <CentralDashboard />
+      <BankAccountsSection />
+      <BudgetSection />
       <SpreadsheetsSection />
       <SecurityDashboard />
       <FraudProtection />

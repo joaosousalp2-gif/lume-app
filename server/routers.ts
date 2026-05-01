@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRulesByUserId, createRule, updateRule, deleteRule, matchRuleForDescription, incrementRuleUsage } from "./db";
+import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRulesByUserId, createRule, updateRule, deleteRule, matchRuleForDescription, incrementRuleUsage, getBankAccountsByUserId, createBankAccount, updateBankAccount, deleteBankAccount, getTotalBalance, getBudgetsByUserAndMonth, createBudget, updateBudget, deleteBudget } from "./db";
 import { suggestCategory, getAvailableCategories } from "./_core/categorization";
 
 export const appRouter = router({
@@ -82,6 +82,69 @@ export const appRouter = router({
         type: z.enum(["receita", "despesa"]),
       }))
       .query(({ input }) => getAvailableCategories(input.type)),
+  }),
+
+  accounts: router({
+    list: protectedProcedure.query(({ ctx }) => getBankAccountsByUserId(ctx.user.id)),
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        type: z.enum(["corrente", "poupanca", "investimentos", "outro"]),
+        balance: z.string().default("0"),
+        bankName: z.string().optional(),
+        accountNumber: z.string().optional(),
+      }))
+      .mutation(({ ctx, input }) => createBankAccount({
+        userId: ctx.user.id,
+        ...input,
+        isActive: 1,
+        displayOrder: 0,
+      })),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        type: z.enum(["corrente", "poupanca", "investimentos", "outro"]).optional(),
+        balance: z.string().optional(),
+        bankName: z.string().optional(),
+        accountNumber: z.string().optional(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(({ input }) => updateBankAccount(input.id, input)),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(({ input }) => deleteBankAccount(input.id)),
+    getTotalBalance: protectedProcedure
+      .query(({ ctx }) => getTotalBalance(ctx.user.id)),
+  }),
+
+  budgets: router({
+    list: protectedProcedure
+      .input(z.object({ month: z.string() }))
+      .query(({ ctx, input }) => getBudgetsByUserAndMonth(ctx.user.id, input.month)),
+    create: protectedProcedure
+      .input(z.object({
+        category: z.string().min(1),
+        limit: z.string().min(1),
+        month: z.string(),
+      }))
+      .mutation(({ ctx, input }) => createBudget({
+        userId: ctx.user.id,
+        ...input,
+        alertThresholds: "75,90,100",
+      })),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        category: z.string().optional(),
+        limit: z.string().optional(),
+        month: z.string().optional(),
+        alertThresholds: z.string().optional(),
+      }))
+      .mutation(({ input }) => updateBudget(input.id, input)),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(({ input }) => deleteBudget(input.id)),
   }),
 
   rules: router({

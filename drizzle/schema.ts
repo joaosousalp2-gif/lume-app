@@ -69,3 +69,39 @@ export const categorizationRules = mysqlTable("categorizationRules", {
 
 export type CategorizationRule = typeof categorizationRules.$inferSelect;
 export type InsertCategorizationRule = typeof categorizationRules.$inferInsert;
+/**
+ * Bank Accounts table for storing multiple user accounts
+ */
+export const bankAccounts = mysqlTable("bankAccounts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  name: varchar("name", { length: 128 }).notNull(),
+  type: mysqlEnum("type", ["corrente", "poupanca", "investimentos", "outro"]).notNull(),
+  balance: varchar("balance", { length: 20 }).default("0").notNull(),
+  bankName: varchar("bankName", { length: 128 }),
+  accountNumber: varchar("accountNumber", { length: 20 }),
+  isActive: int("isActive").default(1).notNull(),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BankAccount = typeof bankAccounts.$inferSelect;
+export type InsertBankAccount = typeof bankAccounts.$inferInsert;
+
+/**
+ * Budget table for storing monthly budgets by category
+ */
+export const budgets = mysqlTable("budgets", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  category: varchar("category", { length: 64 }).notNull(),
+  limit: varchar("limit", { length: 20 }).notNull(),
+  month: varchar("month", { length: 7 }).notNull(),
+  alertThresholds: varchar("alertThresholds", { length: 50 }).default("75,90,100").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Budget = typeof budgets.$inferSelect;
+export type InsertBudget = typeof budgets.$inferInsert;

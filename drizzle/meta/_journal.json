@@ -22,6 +22,13 @@
       "when": 1777594036420,
       "tag": "0002_outgoing_green_goblin",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1777595819598,
+      "tag": "0003_mysterious_squadron_supreme",
+      "breakpoints": true
     }
   ]
 }

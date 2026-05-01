@@ -14,6 +14,8 @@ const navLinks = [
   { href: "#lancamentos", label: "Lancamentos" },
   { href: "#savings-goals", label: "Metas" },
   { href: "#central-dashboard", label: "Dashboard" },
+  { href: "#bank-accounts", label: "Contas" },
+  { href: "#budgets", label: "Orcamento" },
   { href: "#planilhas", label: "Planilhas" },
   { href: "#fraud-protection", label: "Proteção" },
   { href: "#ai-analysis", label: "IA" },
