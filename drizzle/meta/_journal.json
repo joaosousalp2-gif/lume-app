@@ -36,6 +36,13 @@
       "when": 1777650123083,
       "tag": "0004_smiling_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1777657222106,
+      "tag": "0005_loving_stick",
+      "breakpoints": true
     }
   ]
 }

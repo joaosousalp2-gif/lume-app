@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -325,4 +325,57 @@ export async function clearChatHistory(userId: number): Promise<void> {
   if (!db) return;
 
   await db.delete(chatHistory).where(eq(chatHistory.userId, userId));
+}
+
+
+// ===== Financial Goals Helpers =====
+export async function createFinancialGoal(goal: InsertFinancialGoal): Promise<FinancialGoal | null> {
+  const db = await getDb();
+  if (!db) return null;
+  await db.insert(financialGoals).values(goal);
+  const result = await db
+    .select()
+    .from(financialGoals)
+    .where(and(eq(financialGoals.userId, goal.userId), eq(financialGoals.name, goal.name)))
+    .orderBy(desc(financialGoals.createdAt))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getFinancialGoalsByUserId(userId: number): Promise<FinancialGoal[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(financialGoals)
+    .where(eq(financialGoals.userId, userId))
+    .orderBy(desc(financialGoals.createdAt));
+}
+
+export async function getActiveFinancialGoalsByUserId(userId: number): Promise<FinancialGoal[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select()
+    .from(financialGoals)
+    .where(and(eq(financialGoals.userId, userId), eq(financialGoals.status, "ativa")))
+    .orderBy(desc(financialGoals.priority));
+}
+
+export async function updateFinancialGoal(id: number, data: Partial<InsertFinancialGoal>): Promise<FinancialGoal | null> {
+  const db = await getDb();
+  if (!db) return null;
+  await db.update(financialGoals).set(data).where(eq(financialGoals.id, id));
+  const result = await db
+    .select()
+    .from(financialGoals)
+    .where(eq(financialGoals.id, id))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function deleteFinancialGoal(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(financialGoals).where(eq(financialGoals.id, id));
 }

@@ -119,3 +119,24 @@ export const chatHistory = mysqlTable("chatHistory", {
 
 export type ChatMessage = typeof chatHistory.$inferSelect;
 export type InsertChatMessage = typeof chatHistory.$inferInsert;
+
+/**
+ * Financial Goals table for storing user savings goals
+ */
+export const financialGoals = mysqlTable("financialGoals", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  name: varchar("name", { length: 128 }).notNull(),
+  description: text("description"),
+  targetAmount: varchar("targetAmount", { length: 20 }).notNull(),
+  currentAmount: varchar("currentAmount", { length: 20 }).default("0").notNull(),
+  category: varchar("category", { length: 64 }),
+  targetDate: varchar("targetDate", { length: 10 }),
+  priority: mysqlEnum("priority", ["baixa", "media", "alta"]).default("media").notNull(),
+  status: mysqlEnum("status", ["ativa", "concluida", "cancelada"]).default("ativa").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type FinancialGoal = typeof financialGoals.$inferSelect;
+export type InsertFinancialGoal = typeof financialGoals.$inferInsert;
