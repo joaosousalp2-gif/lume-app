@@ -15,6 +15,38 @@ interface ChatMessage {
   createdAt: Date;
 }
 
+interface ResponseQuality {
+  hasStructure: boolean;
+  hasDiagnosis: boolean;
+  hasRisk: boolean;
+  hasRecommendation: boolean;
+  hasActions: boolean;
+  score: number; // 0-100
+}
+
+function validateResponseStructure(content: string): ResponseQuality {
+  const hasDiagnosis = /##\s*1\.\s*DIAGNÓSTICO|diagnóstico/i.test(content);
+  const hasRisk = /##\s*2\.\s*RISCO|risco/i.test(content);
+  const hasRecommendation = /##\s*3\.\s*RECOMENDAÇÃO|recomendação/i.test(content);
+  const hasActions = /##\s*4\.\s*AÇÕES|ações|ação/i.test(content);
+  const hasStructure = hasDiagnosis && hasRisk && hasRecommendation && hasActions;
+  
+  let score = 0;
+  if (hasDiagnosis) score += 25;
+  if (hasRisk) score += 25;
+  if (hasRecommendation) score += 25;
+  if (hasActions) score += 25;
+  
+  return {
+    hasStructure,
+    hasDiagnosis,
+    hasRisk,
+    hasRecommendation,
+    hasActions,
+    score,
+  };
+}
+
 export default function ChatAssistant() {
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -61,6 +93,9 @@ export default function ChatAssistant() {
         },
       ]);
 
+      // Validate response structure
+      const quality = validateResponseStructure(result.message);
+      
       // Add assistant message
       setMessages((prev) => [
         ...prev,
@@ -72,6 +107,11 @@ export default function ChatAssistant() {
           createdAt: new Date(),
         },
       ]);
+      
+      // Show quality indicator if response is not well-structured
+      if (!quality.hasStructure && quality.score < 75) {
+        console.warn("Response quality warning:", quality);
+      }
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error);
     } finally {
