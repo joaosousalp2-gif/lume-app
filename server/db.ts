@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -282,4 +282,47 @@ export async function getBudgetForCategory(userId: number, category: string, mon
     .limit(1);
 
   return result.length > 0 ? result[0] : null;
+}
+
+
+// ===== Chat History Helpers =====
+
+export async function saveChatMessage(userId: number, role: "user" | "assistant", content: string): Promise<ChatMessage | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.insert(chatHistory).values({
+    userId,
+    role,
+    content,
+  });
+
+  // Return the inserted message
+  const messages = await db
+    .select()
+    .from(chatHistory)
+    .where(and(eq(chatHistory.userId, userId), eq(chatHistory.role, role)))
+    .orderBy(desc(chatHistory.createdAt))
+    .limit(1);
+
+  return messages.length > 0 ? messages[0] : null;
+}
+
+export async function getChatHistory(userId: number, limit: number = 50): Promise<ChatMessage[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(chatHistory)
+    .where(eq(chatHistory.userId, userId))
+    .orderBy(desc(chatHistory.createdAt))
+    .limit(limit);
+}
+
+export async function clearChatHistory(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db.delete(chatHistory).where(eq(chatHistory.userId, userId));
 }

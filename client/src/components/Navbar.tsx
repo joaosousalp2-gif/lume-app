@@ -7,7 +7,13 @@
 import { useState, useEffect } from "react";
 import { Lightbulb, Menu, X } from "lucide-react";
 
-const navLinks = [
+interface NavLink {
+  href: string;
+  label: string;
+  external?: boolean;
+}
+
+const navLinks: NavLink[] = [
   { href: "#funcionalidades", label: "Funcionalidades" },
   { href: "#seguranca", label: "Segurança" },
   { href: "#como-funciona", label: "Como Funciona" },
@@ -19,6 +25,7 @@ const navLinks = [
   { href: "#planilhas", label: "Planilhas" },
   { href: "#fraud-protection", label: "Proteção" },
   { href: "#ai-analysis", label: "IA" },
+  { href: "/dashboard/chat", label: "Agente IA", external: true },
   { href: "#trust-verification", label: "Confiabilidade" },
   { href: "#download", label: "Baixar App" },
 ];
@@ -33,8 +40,12 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, external?: boolean) => {
     setMobileOpen(false);
+    if (external) {
+      window.location.href = href;
+      return;
+    }
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
@@ -71,7 +82,7 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <li key={link.href}>
                 <button
-                  onClick={() => handleNavClick(link.href)}
+                  onClick={() => handleNavClick(link.href, link.external)}
                   className={`text-base font-semibold transition-colors duration-200 hover:text-blue-600 ${
                     scrolled ? "text-gray-700" : "text-white/90"
                   }`}

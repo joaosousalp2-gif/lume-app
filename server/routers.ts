@@ -3,8 +3,9 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRulesByUserId, createRule, updateRule, deleteRule, matchRuleForDescription, incrementRuleUsage, getBankAccountsByUserId, createBankAccount, updateBankAccount, deleteBankAccount, getTotalBalance, getBudgetsByUserAndMonth, createBudget, updateBudget, deleteBudget } from "./db";
+import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRulesByUserId, createRule, updateRule, deleteRule, matchRuleForDescription, incrementRuleUsage, getBankAccountsByUserId, createBankAccount, updateBankAccount, deleteBankAccount, getTotalBalance, getBudgetsByUserAndMonth, createBudget, updateBudget, deleteBudget, saveChatMessage, getChatHistory, clearChatHistory } from "./db";
 import { suggestCategory, getAvailableCategories } from "./_core/categorization";
+import { chatRouter } from "./routers/chat";
 
 export const appRouter = router({
   system: systemRouter,
@@ -185,6 +186,8 @@ export const appRouter = router({
       }))
       .query(({ ctx, input }) => matchRuleForDescription(ctx.user.id, input.description, input.type)),
   }),
+
+  chat: chatRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -10,12 +10,14 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import ChatAssistant from "./pages/ChatAssistant";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/dashboard/chat"} component={ChatAssistant} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

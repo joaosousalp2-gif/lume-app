@@ -105,3 +105,17 @@ export const budgets = mysqlTable("budgets", {
 
 export type Budget = typeof budgets.$inferSelect;
 export type InsertBudget = typeof budgets.$inferInsert;
+
+/**
+ * Chat History table for storing AI chat conversations
+ */
+export const chatHistory = mysqlTable("chatHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  role: mysqlEnum("role", ["user", "assistant"]).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChatMessage = typeof chatHistory.$inferSelect;
+export type InsertChatMessage = typeof chatHistory.$inferInsert;
