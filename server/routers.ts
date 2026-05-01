@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRulesByUserId, createRule, updateRule, deleteRule, matchRuleForDescription, incrementRuleUsage, getBankAccountsByUserId, createBankAccount, updateBankAccount, deleteBankAccount, getTotalBalance, getBudgetsByUserAndMonth, createBudget, updateBudget, deleteBudget, saveChatMessage, getChatHistory, clearChatHistory } from "./db";
 import { suggestCategory, getAvailableCategories } from "./_core/categorization";
 import { chatRouter } from "./routers/chat";
+import { syncRouter } from "./routers/sync";
 
 export const appRouter = router({
   system: systemRouter,
@@ -188,6 +189,7 @@ export const appRouter = router({
   }),
 
   chat: chatRouter,
+  sync: syncRouter,
 });
 
 export type AppRouter = typeof appRouter;
