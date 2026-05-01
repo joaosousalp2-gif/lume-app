@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -117,4 +117,74 @@ export async function deleteLaunch(id: number) {
   if (!db) throw new Error("Database not available");
 
   return await db.delete(launches).where(eq(launches.id, id));
+}
+
+// Categorization Rules queries
+export async function getRulesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(categorizationRules)
+    .where(and(eq(categorizationRules.userId, userId), eq(categorizationRules.isActive, 1)))
+    .orderBy(desc(categorizationRules.priority));
+}
+
+export async function createRule(rule: typeof categorizationRules.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(categorizationRules).values(rule);
+  return result;
+}
+
+export async function updateRule(id: number, data: Partial<typeof categorizationRules.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.update(categorizationRules).set(data).where(eq(categorizationRules.id, id));
+}
+
+export async function deleteRule(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  return await db.delete(categorizationRules).where(eq(categorizationRules.id, id));
+}
+
+export async function matchRuleForDescription(
+  userId: number,
+  description: string,
+  type: "receita" | "despesa"
+): Promise<CategorizationRule | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const rules = await getRulesByUserId(userId);
+  const lowerDesc = description.toLowerCase();
+
+  // Find first matching rule (ordered by priority)
+  for (const rule of rules) {
+    if (rule.type !== type) continue;
+    const pattern = rule.pattern.toLowerCase();
+    if (lowerDesc.includes(pattern)) {
+      return rule;
+    }
+  }
+
+  return null;
+}
+
+export async function incrementRuleUsage(ruleId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  const rule = await db.select().from(categorizationRules).where(eq(categorizationRules.id, ruleId)).limit(1);
+  if (rule.length > 0) {
+    await db
+      .update(categorizationRules)
+      .set({ timesApplied: (rule[0].timesApplied || 0) + 1 })
+      .where(eq(categorizationRules.id, ruleId));
+  }
 }

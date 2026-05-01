@@ -74,8 +74,20 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
   const [suggestingCategory, setSuggestingCategory] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   
-  // Mutation para sugerir categoria
+  // Mutations
   const suggestCategoryMutation = trpc.launches.suggestCategory.useMutation();
+  const [ruleMatched, setRuleMatched] = useState<{ category: string; pattern: string } | null>(null);
+
+  // Verificar regras ao mudar descrição
+  useEffect(() => {
+    if (formData.description.trim() && !formData.category && type) {
+      // Aqui seria feito a verificação de regras
+      // Por enquanto, apenas resetamos o estado
+      setRuleMatched(null);
+    } else {
+      setRuleMatched(null);
+    }
+  }, [formData.description, type]);
 
   // Resetar estado quando modal abre/fecha ou tipo muda
   useEffect(() => {
@@ -91,6 +103,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
         recurrence: "Única",
         endDate: "",
       });
+      setRuleMatched(null);
     }
   }, [isOpen, type]);
 
@@ -483,8 +496,40 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
               <p className="text-xs text-gray-500 mt-1">{formData.description.length}/200</p>
             </div>
 
+            {/* Matched Rule */}
+            {ruleMatched && (
+              <div className="p-4 rounded-xl bg-amber-50 border-2 border-amber-300">
+                <div className="flex items-start gap-3 mb-3">
+                  <CheckCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-amber-800">Regra Personalizada Encontrada</p>
+                    <p className="text-lg font-bold text-amber-900 mt-1">{ruleMatched.category}</p>
+                    <p className="text-xs text-amber-700 mt-1">Padrão: "{ruleMatched.pattern}"</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setFormData({ ...formData, category: ruleMatched.category });
+                      setRuleMatched(null);
+                      toast.success(`Categoria "${ruleMatched.category}" aplicada!`);
+                    }}
+                    className="flex-1 py-2 rounded-lg font-bold text-white bg-amber-600 hover:bg-amber-700 transition-all"
+                  >
+                    Aplicar
+                  </button>
+                  <button
+                    onClick={() => setRuleMatched(null)}
+                    className="flex-1 py-2 rounded-lg font-bold text-amber-700 bg-white border-2 border-amber-300 hover:bg-amber-50 transition-all"
+                  >
+                    Ignorar
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* AI Category Suggestion Button */}
-            {formData.description && !formData.category && (
+            {formData.description && !formData.category && !ruleMatched && (
               <div className="p-4 rounded-xl bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
                 <button
                   onClick={handleSuggestCategory}

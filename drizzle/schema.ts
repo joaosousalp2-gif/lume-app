@@ -44,3 +44,28 @@ export const launches = mysqlTable("launches", {
 
 export type Launch = typeof launches.$inferSelect;
 export type InsertLaunch = typeof launches.$inferInsert;
+
+/**
+ * Categorization Rules table for storing user-defined rules
+ */
+export const categorizationRules = mysqlTable("categorizationRules", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  /** Pattern to match against launch description (case-insensitive) */
+  pattern: varchar("pattern", { length: 255 }).notNull(),
+  /** Type of launch: receita or despesa */
+  type: mysqlEnum("type", ["receita", "despesa"]).notNull(),
+  /** Category to apply when pattern matches */
+  category: varchar("category", { length: 64 }).notNull(),
+  /** Priority for rule matching (higher = applied first) */
+  priority: int("priority").default(0).notNull(),
+  /** Whether rule is active */
+  isActive: int("isActive").default(1).notNull(),
+  /** Number of times this rule was applied */
+  timesApplied: int("timesApplied").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CategorizationRule = typeof categorizationRules.$inferSelect;
+export type InsertCategorizationRule = typeof categorizationRules.$inferInsert;

@@ -15,6 +15,13 @@
       "when": 1777573336019,
       "tag": "0001_flat_big_bertha",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1777594036420,
+      "tag": "0002_outgoing_green_goblin",
+      "breakpoints": true
     }
   ]
 }

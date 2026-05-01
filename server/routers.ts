@@ -3,7 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch } from "./db";
+import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRulesByUserId, createRule, updateRule, deleteRule, matchRuleForDescription, incrementRuleUsage } from "./db";
 import { suggestCategory, getAvailableCategories } from "./_core/categorization";
 
 export const appRouter = router({
@@ -82,6 +82,45 @@ export const appRouter = router({
         type: z.enum(["receita", "despesa"]),
       }))
       .query(({ input }) => getAvailableCategories(input.type)),
+  }),
+
+  rules: router({
+    list: protectedProcedure.query(({ ctx }) => getRulesByUserId(ctx.user.id)),
+    create: protectedProcedure
+      .input(z.object({
+        pattern: z.string().min(1, "Padrão não pode estar vazio"),
+        type: z.enum(["receita", "despesa"]),
+        category: z.string().min(1, "Categoria não pode estar vazia"),
+        priority: z.number().default(0),
+      }))
+      .mutation(({ ctx, input }) => createRule({
+        userId: ctx.user.id,
+        pattern: input.pattern,
+        type: input.type,
+        category: input.category,
+        priority: input.priority,
+        isActive: 1,
+        timesApplied: 0,
+      })),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        pattern: z.string().optional(),
+        type: z.enum(["receita", "despesa"]).optional(),
+        category: z.string().optional(),
+        priority: z.number().optional(),
+        isActive: z.number().optional(),
+      }))
+      .mutation(({ input }) => updateRule(input.id, input)),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(({ input }) => deleteRule(input.id)),
+    matchRule: protectedProcedure
+      .input(z.object({
+        description: z.string(),
+        type: z.enum(["receita", "despesa"]),
+      }))
+      .query(({ ctx, input }) => matchRuleForDescription(ctx.user.id, input.description, input.type)),
   }),
 });
 
