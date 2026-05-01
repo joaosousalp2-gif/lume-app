@@ -26,6 +26,8 @@ const BankAccounts = lazy(() => import("@/components/BankAccounts"));
 const Budget = lazy(() => import("@/components/Budget"));
 const TrustVerification = lazy(() => import("@/components/TrustVerification"));
 const TrustIntegration = lazy(() => import("@/components/TrustIntegration"));
+const EconomicIndicators = lazy(() => import("@/components/EconomicIndicators"));
+const DocumentValidator = lazy(() => import("@/components/DocumentValidator"));
 const DownloadSection = lazy(() => import("@/components/DownloadSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 
@@ -103,6 +105,14 @@ export default function Home() {
       
       <Suspense fallback={<SectionPlaceholder />}>
         <TrustIntegration />
+      </Suspense>
+      
+      <Suspense fallback={<SectionPlaceholder />}>
+        <EconomicIndicators />
+      </Suspense>
+      
+      <Suspense fallback={<SectionPlaceholder />}>
+        <DocumentValidator />
       </Suspense>
       
       <Suspense fallback={<SectionPlaceholder />}>

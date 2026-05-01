@@ -25,9 +25,18 @@
 - [x] Acessibilidade WCAG 2.1 AA
 - [x] Migração para Banco de Dados (tRPC sync)
 
+## Fase 4: Integração com Bancos de Dados Públicos
+- [x] Pesquisar e configurar APIs de Open Banking (Banco Central)
+- [x] Implementar integração com dados de Fraude e validação de CPF/CNPJ
+- [x] Implementar integração com Cotações (B3, Banco Central, CoinGecko)
+- [x] Implementar integração com Dados Econômicos (IBGE, Banco Central)
+- [x] Criar helpers para cache e sincronização de dados públicos
+- [x] Adicionar UI para exibir dados de cotações e indicadores
+- [x] Testar todas as integrações e validar dados
+- [x] Salvar checkpoint com integrações públicas
+
 ## Próximas Fases (Futuro)
 - [ ] Segurança: 2FA, criptografia, auditoria
-- [ ] Open Banking: integração com bancos
 - [ ] Agente IA Avançado: recomendações proativas
 - [ ] Testes E2E: Playwright
 - [ ] Analytics: Plausible/Mixpanel

@@ -7,6 +7,7 @@ import { createLaunch, deleteLaunch, getLaunchesByUserId, updateLaunch, getRules
 import { suggestCategory, getAvailableCategories } from "./_core/categorization";
 import { chatRouter } from "./routers/chat";
 import { syncRouter } from "./routers/sync";
+import { publicDataRouter } from "./routers/publicData";
 
 export const appRouter = router({
   system: systemRouter,
@@ -190,6 +191,7 @@ export const appRouter = router({
 
   chat: chatRouter,
   sync: syncRouter,
+  publicData: router(publicDataRouter),
 });
 
 export type AppRouter = typeof appRouter;
