@@ -21,7 +21,7 @@ const navLinks: NavLink[] = [
   { href: "#savings-goals", label: "Metas" },
   { href: "#central-dashboard", label: "Dashboard" },
   { href: "#bank-accounts", label: "Contas" },
-  { href: "#budgets", label: "Orcamento" },
+  // { href: "#budgets", label: "Orcamento" }, // Desabilitado temporariamente
   { href: "#planilhas", label: "Planilhas" },
   { href: "#fraud-protection", label: "Proteção" },
   { href: "#ai-analysis", label: "IA" },
