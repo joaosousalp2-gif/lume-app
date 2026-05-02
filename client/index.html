@@ -14,6 +14,13 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Plausible Analytics -->
+    <script
+      defer
+      data-domain="lume-app.local"
+      src="https://plausible.io/js/script.js"></script>
+    
+    <!-- Fallback: Umami Analytics -->
     <script
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
