@@ -63,3 +63,11 @@
 - [x] Implementar Design System com Storybook (Button, Card stories)
 - [x] Adicionar scripts: test:e2e, storybook, build-storybook
 - [x] Salvar checkpoint final
+
+## Fase 8: Envio Real de SMS/Email e Testes E2E Expandidos
+- [x] Implementar envio de SMS com Twilio (4 funções)
+- [x] Implementar envio de Email com SendGrid (5 funções)
+- [x] Expandir testes E2E para transações (8 testes)
+- [x] Expandir testes E2E para 2FA (8 testes)
+- [x] Expandir testes E2E para recomendações de IA (10 testes)
+- [x] Testar e salvar checkpoint final
