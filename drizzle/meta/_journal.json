@@ -43,6 +43,13 @@
       "when": 1777657222106,
       "tag": "0005_loving_stick",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1777679980150,
+      "tag": "0006_natural_forgotten_one",
+      "breakpoints": true
     }
   ]
 }

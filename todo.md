@@ -35,9 +35,29 @@
 - [x] Testar todas as integrações e validar dados
 - [x] Salvar checkpoint com integrações públicas
 
+## Fase 5: Segurança Avançada
+- [x] Implementar 2FA com SMS (backup codes)
+- [x] Implementar 2FA com Email (backup codes)
+- [x] Implementar 2FA com Authenticator (TOTP)
+- [x] Criptografar dados bancários (AES-256-GCM)
+- [x] Criptografar transações financeiras (via encryptedFields)
+- [x] Criptografar dados pessoais (CPF, endereço)
+- [x] Implementar auditoria de login/logout
+- [x] Criar router tRPC para gerenciar 2FA
+- [x] Testar fluxo completo de 2FA (18 testes)
+- [x] Salvar checkpoint com segurança
+
+## Fase 6: Agente IA Avançado
+- [x] Implementar recomendações de economia
+- [x] Implementar recomendações de investimentos
+- [x] Implementar detecção de fraude (padrões suspeitos)
+- [x] Implementar planejamento financeiro personalizado
+- [x] Criar endpoints para solicitar recomendações (sob demanda)
+- [x] Integrar com LLM existente (invokeLLM)
+- [x] Testar recomendações (214 testes)
+- [x] Salvar checkpoint com IA avançada
+
 ## Próximas Fases (Futuro)
-- [ ] Segurança: 2FA, criptografia, auditoria
-- [ ] Agente IA Avançado: recomendações proativas
 - [ ] Testes E2E: Playwright
 - [ ] Analytics: Plausible/Mixpanel
 - [ ] Design System: Storybook

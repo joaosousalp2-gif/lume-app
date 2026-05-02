@@ -8,6 +8,8 @@ import { suggestCategory, getAvailableCategories } from "./_core/categorization"
 import { chatRouter } from "./routers/chat";
 import { syncRouter } from "./routers/sync";
 import { publicDataRouter } from "./routers/publicData";
+import { securityRouter } from "./routers/security";
+import { aiAdvancedRouter } from "./routers/aiAdvanced";
 
 export const appRouter = router({
   system: systemRouter,
@@ -192,6 +194,8 @@ export const appRouter = router({
   chat: chatRouter,
   sync: syncRouter,
   publicData: router(publicDataRouter),
+  security: securityRouter,
+  aiAdvanced: aiAdvancedRouter,
 });
 
 export type AppRouter = typeof appRouter;

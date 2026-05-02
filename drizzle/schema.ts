@@ -140,3 +140,82 @@ export const financialGoals = mysqlTable("financialGoals", {
 
 export type FinancialGoal = typeof financialGoals.$inferSelect;
 export type InsertFinancialGoal = typeof financialGoals.$inferInsert;
+
+/**
+ * 2FA Methods table for storing user's enabled 2FA methods
+ */
+export const twoFAMethods = mysqlTable("twoFAMethods", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  method: mysqlEnum("method", ["email", "sms", "authenticator"]).notNull(),
+  isEnabled: int("isEnabled").default(0).notNull(),
+  /** For SMS: phone number (encrypted) */
+  phoneNumber: varchar("phoneNumber", { length: 255 }),
+  /** For Authenticator: secret key (encrypted) */
+  secret: varchar("secret", { length: 255 }),
+  /** Backup codes (encrypted, comma-separated) */
+  backupCodes: text("backupCodes"),
+  /** Number of backup codes remaining */
+  backupCodesRemaining: int("backupCodesRemaining").default(10).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TwoFAMethod = typeof twoFAMethods.$inferSelect;
+export type InsertTwoFAMethod = typeof twoFAMethods.$inferInsert;
+
+/**
+ * Audit Log table for tracking user actions (login/logout)
+ */
+export const auditLogs = mysqlTable("auditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  action: mysqlEnum("action", ["login", "logout", "2fa_enabled", "2fa_disabled", "password_changed", "data_accessed", "data_modified"]).notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  details: text("details"),
+  status: mysqlEnum("status", ["success", "failed"]).default("success").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+/**
+ * Encrypted Fields table for storing encrypted sensitive data
+ * Maps field identifiers to their encrypted values and encryption metadata
+ */
+export const encryptedFields = mysqlTable("encryptedFields", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  /** Field identifier: e.g., "bankAccount_123_cpf" */
+  fieldKey: varchar("fieldKey", { length: 255 }).notNull(),
+  /** Encrypted value */
+  encryptedValue: text("encryptedValue").notNull(),
+  /** Encryption algorithm version */
+  encryptionVersion: int("encryptionVersion").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EncryptedField = typeof encryptedFields.$inferSelect;
+export type InsertEncryptedField = typeof encryptedFields.$inferInsert;
+
+/**
+ * AI Recommendations table for storing generated recommendations
+ */
+export const aiRecommendations = mysqlTable("aiRecommendations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  type: mysqlEnum("type", ["economia", "investimento", "fraude", "planejamento"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  priority: mysqlEnum("priority", ["baixa", "media", "alta"]).default("media").notNull(),
+  status: mysqlEnum("status", ["novo", "visualizado", "implementado", "descartado"]).default("novo").notNull(),
+  metadata: text("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AIRecommendation = typeof aiRecommendations.$inferSelect;
+export type InsertAIRecommendation = typeof aiRecommendations.$inferInsert;
