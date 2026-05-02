@@ -5,11 +5,12 @@
  * Público-alvo: pessoas com mais de 60 anos e seus familiares
  */
 
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import Tabs, { TabItem } from "@/components/Tabs";
+import { useTabsContext } from "@/contexts/TabsContext";
 import { Wallet, Shield, BarChart3, Brain, Download, CheckCircle2 } from "lucide-react";
 
 // Lazy load seções
@@ -44,7 +45,7 @@ function SectionPlaceholder() {
 }
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState("financeiro");
+  const { activeTab, setActiveTab } = useTabsContext();
 
   const mainTabs: TabItem[] = [
     {
@@ -162,10 +163,10 @@ export default function Home() {
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
             <Tabs
               tabs={mainTabs}
-              defaultTab="financeiro"
+              defaultTab={activeTab}
               variant="pills"
               size="md"
-              onTabChange={setActiveSection}
+              onTabChange={setActiveTab}
               className="w-full"
             />
           </div>

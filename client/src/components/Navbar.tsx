@@ -6,33 +6,36 @@
 
 import { useState, useEffect } from "react";
 import { Lightbulb, Menu, X } from "lucide-react";
+import { useTabsContext } from "@/contexts/TabsContext";
+import ThemeToggle from "./ThemeToggle";
 
 interface NavLink {
   href: string;
   label: string;
   external?: boolean;
+  tab?: string;
 }
 
 const navLinks: NavLink[] = [
-  { href: "#funcionalidades", label: "Funcionalidades" },
-  { href: "#seguranca", label: "Segurança" },
-  { href: "#como-funciona", label: "Como Funciona" },
-  { href: "#lancamentos", label: "Lancamentos" },
-  { href: "#savings-goals", label: "Metas" },
-  { href: "#central-dashboard", label: "Dashboard" },
-  { href: "#bank-accounts", label: "Contas" },
-  // { href: "#budgets", label: "Orcamento" }, // Desabilitado temporariamente
-  { href: "#planilhas", label: "Planilhas" },
-  { href: "#fraud-protection", label: "Proteção" },
-  { href: "#ai-analysis", label: "IA" },
+  { href: "#funcionalidades", label: "Funcionalidades", tab: "financeiro" },
+  { href: "#seguranca", label: "Segurança", tab: "seguranca" },
+  { href: "#como-funciona", label: "Como Funciona", tab: "analise" },
+  { href: "#lancamentos", label: "Lancamentos", tab: "financeiro" },
+  { href: "#savings-goals", label: "Metas", tab: "financeiro" },
+  { href: "#central-dashboard", label: "Dashboard", tab: "financeiro" },
+  { href: "#bank-accounts", label: "Contas", tab: "financeiro" },
+  { href: "#planilhas", label: "Planilhas", tab: "financeiro" },
+  { href: "#fraud-protection", label: "Proteção", tab: "seguranca" },
+  { href: "#ai-analysis", label: "IA", tab: "analise" },
   { href: "/dashboard/chat", label: "Agente IA", external: true },
-  { href: "#trust-verification", label: "Confiabilidade" },
-  { href: "#download", label: "Baixar App" },
+  { href: "#trust-verification", label: "Confiabilidade", tab: "seguranca" },
+  { href: "#download", label: "Baixar App", tab: "download" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { setActiveTab } = useTabsContext();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -40,11 +43,14 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = (href: string, external?: boolean) => {
+  const handleNavClick = (href: string, external?: boolean, tab?: string) => {
     setMobileOpen(false);
     if (external) {
       window.location.href = href;
       return;
+    }
+    if (tab) {
+      setActiveTab(tab);
     }
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -84,7 +90,7 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <li key={link.href} role="none">
                 <button
-                  onClick={() => handleNavClick(link.href, link.external)}
+                  onClick={() => handleNavClick(link.href, link.external, link.tab)}
                   className={`text-base font-semibold transition-colors duration-200 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1 ${
                     scrolled ? "text-gray-700" : "text-white/90"
                   }`}
@@ -96,6 +102,11 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+
+          {/* Theme Toggle */}
+          <div className="hidden md:block">
+            <ThemeToggle />
+          </div>
 
           {/* CTA Button */}
           <div className="hidden md:block">
@@ -132,7 +143,7 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <button
                 key={link.href}
-                onClick={() => handleNavClick(link.href)}
+                onClick={() => handleNavClick(link.href, link.external, link.tab)}
                 className="text-left text-lg font-semibold text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 py-2 border-b border-gray-100 transition-colors rounded px-2"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
               >
