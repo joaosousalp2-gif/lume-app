@@ -1,6 +1,6 @@
 /*
  * App — Lume
- * Tema: light (fundo branco, textos escuros — alto contraste para acessibilidade)
+ * Tema: dark (fundo escuro/azul, textos claros — modo noturno por padrão, com toggle para light)
  */
 
 import { Toaster } from "@/components/ui/sonner";

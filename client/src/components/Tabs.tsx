@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 export interface TabItem {
@@ -27,6 +27,13 @@ export const Tabs: React.FC<TabsProps> = ({
   onTabChange,
 }) => {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
+
+  // Sincronizar activeTab quando defaultTab muda (ex: clique na Navbar)
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);

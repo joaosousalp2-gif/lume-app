@@ -52,8 +52,15 @@ export default function Navbar() {
     if (tab) {
       setActiveTab(tab);
     }
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    // Tentar fazer scroll apenas se o elemento existir
+    try {
+      const el = document.querySelector(href);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    } catch (error) {
+      console.warn(`Elemento ${href} não encontrado`);
+    }
   };
 
   return (
