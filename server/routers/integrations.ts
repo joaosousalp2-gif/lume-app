@@ -16,7 +16,6 @@ export const integrationsRouter = router({
     .input(
       z.object({
         provider: z.enum(["twilio", "sendgrid", "stripe", "openai"]),
-        name: z.string().min(1).max(255),
         credentials: z.record(z.string(), z.string()),
       })
     )
@@ -29,7 +28,7 @@ export const integrationsRouter = router({
         const result = await db.addUserIntegration(
           ctx.user.id,
           input.provider,
-          input.name,
+          input.provider, // Use provider as name
           encryptedCredentials
         );
 
@@ -40,10 +39,7 @@ export const integrationsRouter = router({
         };
       } catch (error) {
         console.error("[Integrations Add Error]", error);
-        return {
-          success: false,
-          error: "Failed to add integration",
-        };
+        throw new Error("Failed to add integration");
       }
     }),
 
@@ -54,24 +50,17 @@ export const integrationsRouter = router({
     try {
       const integrations = await db.getUserIntegrations(ctx.user.id);
 
-      return {
-        success: true,
-        integrations: integrations.map((i) => ({
-          id: i.id,
-          provider: i.provider,
-          name: i.name,
-          isActive: i.isActive,
-          lastUsed: i.lastUsed,
-          createdAt: i.createdAt,
-        })),
-      };
+      return integrations.map((i) => ({
+        id: i.id,
+        provider: i.provider,
+        name: i.name,
+        isActive: i.isActive,
+        lastUsed: i.lastUsed,
+        createdAt: i.createdAt,
+      }));
     } catch (error) {
       console.error("[Integrations List Error]", error);
-      return {
-        success: false,
-        error: "Failed to list integrations",
-        integrations: [],
-      };
+      throw new Error("Failed to list integrations");
     }
   }),
 
@@ -79,40 +68,31 @@ export const integrationsRouter = router({
    * Get a specific integration with decrypted credentials
    */
   get: protectedProcedure
-    .input(z.object({ integrationId: z.number() }))
+    .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       try {
         const integration = await db.getUserIntegrationById(
           ctx.user.id,
-          input.integrationId
+          input.id
         );
 
         if (!integration) {
-          return {
-            success: false,
-            error: "Integration not found",
-          };
+          throw new Error("Integration not found");
         }
 
         // Decrypt credentials
         const credentials = JSON.parse(decryptData(integration.credentials));
 
         return {
-          success: true,
-          integration: {
-            id: integration.id,
-            provider: integration.provider,
-            name: integration.name,
-            credentials,
-            isActive: integration.isActive,
-          },
+          id: integration.id,
+          provider: integration.provider,
+          name: integration.name,
+          credentials,
+          isActive: integration.isActive,
         };
       } catch (error) {
         console.error("[Integrations Get Error]", error);
-        return {
-          success: false,
-          error: "Failed to get integration",
-        };
+        throw new Error("Failed to get integration");
       }
     }),
 
@@ -122,7 +102,7 @@ export const integrationsRouter = router({
   update: protectedProcedure
     .input(
       z.object({
-        integrationId: z.number(),
+        id: z.number(),
         name: z.string().min(1).max(255).optional(),
         credentials: z.record(z.string(), z.string()).optional(),
         isActive: z.boolean().optional(),
@@ -132,14 +112,11 @@ export const integrationsRouter = router({
       try {
         const integration = await db.getUserIntegrationById(
           ctx.user.id,
-          input.integrationId
+          input.id
         );
 
         if (!integration) {
-          return {
-            success: false,
-            error: "Integration not found",
-          };
+          throw new Error("Integration not found");
         }
 
         // Prepare update data
@@ -150,7 +127,7 @@ export const integrationsRouter = router({
           updateData.credentials = encryptData(JSON.stringify(input.credentials));
         }
 
-        await db.updateUserIntegration(input.integrationId, updateData);
+        await db.updateUserIntegration(input.id, updateData);
 
         return {
           success: true,
@@ -158,10 +135,7 @@ export const integrationsRouter = router({
         };
       } catch (error) {
         console.error("[Integrations Update Error]", error);
-        return {
-          success: false,
-          error: "Failed to update integration",
-        };
+        throw new Error("Failed to update integration");
       }
     }),
 
@@ -169,22 +143,19 @@ export const integrationsRouter = router({
    * Delete an integration
    */
   delete: protectedProcedure
-    .input(z.object({ integrationId: z.number() }))
+    .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       try {
         const integration = await db.getUserIntegrationById(
           ctx.user.id,
-          input.integrationId
+          input.id
         );
 
         if (!integration) {
-          return {
-            success: false,
-            error: "Integration not found",
-          };
+          throw new Error("Integration not found");
         }
 
-        await db.deleteUserIntegration(input.integrationId);
+        await db.deleteUserIntegration(input.id);
 
         return {
           success: true,
@@ -192,10 +163,7 @@ export const integrationsRouter = router({
         };
       } catch (error) {
         console.error("[Integrations Delete Error]", error);
-        return {
-          success: false,
-          error: "Failed to delete integration",
-        };
+        throw new Error("Failed to delete integration");
       }
     }),
 });

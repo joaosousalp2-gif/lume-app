@@ -137,8 +137,9 @@
 ## Fase 16: Configuração de Integrações por Usuário
 - [x] Conectar TwoFactorVerification ao App.tsx
 - [x] Adicionar tabela de integrações ao banco de dados (userIntegrations)
-- [ ] Criar componente de configuração de integrações
+- [x] Criar componente de configuração de integrações (UserIntegrationsSettings.tsx)
 - [x] Criar endpoints tRPC para gerenciar integrações (integrationsRouter)
-- [ ] Integrar credenciais do usuário ao envio de SMS/Email
-- [x] Testar fluxo completo com credenciais do usuário (214 testes passando)
+- [x] Adicionar testes para integrationsRouter (14 testes de criptografia e validação)
+- [x] Testar fluxo completo com credenciais do usuário (228 testes passando)
+- [ ] Integrar credenciais do usuário ao envio de SMS/Email (server/sms.ts e server/email.ts)
 - [ ] Salvar checkpoint final e publicar para produção
