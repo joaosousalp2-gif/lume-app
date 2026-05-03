@@ -125,3 +125,10 @@
 - [x] Criar endpoints tRPC para 2FA (auth2FA.ts router)
 - [x] Testar fluxo completo de login com 2FA (214 testes passando)
 - [x] Salvar checkpoint final
+
+## Fase 15: Atualização de Status 2FA no Banco de Dados
+- [x] Adicionar funções de atualização de 2FA no db.ts
+- [x] Modificar endpoint tRPC verify para atualizar banco de dados
+- [x] Adicionar endpoint disable para desabilitar 2FA
+- [x] Testar fluxo completo com atualização (214 testes passando)
+- [x] Salvar checkpoint final

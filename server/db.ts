@@ -379,3 +379,50 @@ export async function deleteFinancialGoal(id: number): Promise<void> {
   if (!db) return;
   await db.delete(financialGoals).where(eq(financialGoals.id, id));
 }
+
+
+// 2FA queries
+export async function updateUserTwoFAStatus(
+  userId: number,
+  twoFAVerified: boolean
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update 2FA status: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({ twoFAVerified })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to update 2FA status", error);
+    throw error;
+  }
+}
+
+export async function getUserTwoFAStatus(userId: number): Promise<{
+  twoFARequired: boolean;
+  twoFAVerified: boolean;
+} | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get 2FA status: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db
+      .select({ twoFARequired: users.twoFARequired, twoFAVerified: users.twoFAVerified })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to get 2FA status", error);
+    return null;
+  }
+}

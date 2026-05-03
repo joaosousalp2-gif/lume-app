@@ -31,13 +31,14 @@ export const auth2FARouter = router({
           };
         }
 
-        // Mark user as 2FA verified
-        // Note: In a real implementation, you'd update the database here
-        // For now, we'll just return success
+        // Mark user as 2FA verified in database
+        await db.updateUserTwoFAStatus(ctx.user.id, true);
+
         return {
           success: true,
           message: "2FA verification successful",
           isValid: true,
+          verified: true,
         };
       } catch (error) {
         console.error("[Auth 2FA Verify Error]", error);
@@ -73,6 +74,27 @@ export const auth2FARouter = router({
       return {
         success: false,
         error: "Failed to get 2FA status",
+      };
+    }
+  }),
+
+  /**
+   * Disable 2FA for current user
+   */
+  disable: protectedProcedure.mutation(async ({ ctx }) => {
+    try {
+      // Disable 2FA
+      await db.updateUserTwoFAStatus(ctx.user.id, false);
+
+      return {
+        success: true,
+        message: "2FA disabled successfully",
+      };
+    } catch (error) {
+      console.error("[Auth 2FA Disable Error]", error);
+      return {
+        success: false,
+        error: "Failed to disable 2FA",
       };
     }
   }),
