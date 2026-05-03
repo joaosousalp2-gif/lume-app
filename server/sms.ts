@@ -1,29 +1,77 @@
 /**
- * SMS helper using Twilio
+ * SMS helper using Twilio with user-specific credentials
  */
 
 import twilio from 'twilio';
+import * as db from './db';
+import { decryptData } from './encryption';
 
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
-
-let twilioClient: ReturnType<typeof twilio> | null = null;
+// Cache for Twilio clients (userId -> client)
+const twilioClients = new Map<number, ReturnType<typeof twilio>>();
 
 /**
- * Initialize Twilio client
+ * Get Twilio client for a specific user
+ * Falls back to environment variables if no user integration found
  */
-function getTwilioClient() {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-    console.warn('[SMS] Twilio credentials not configured');
+async function getTwilioClient(userId?: number) {
+  try {
+    // If userId provided, try to get user's Twilio integration
+    if (userId) {
+      const integrations = await db.getUserIntegrations(userId);
+      const twilioIntegration = integrations.find(i => i.provider === 'twilio');
+
+      if (twilioIntegration) {
+        // Check cache first
+        if (twilioClients.has(userId)) {
+          return twilioClients.get(userId)!;
+        }
+
+        // Decrypt credentials
+        const credentials = JSON.parse(decryptData(twilioIntegration.credentials));
+        const client = twilio(credentials.accountSid, credentials.authToken);
+
+        // Cache the client
+        twilioClients.set(userId, client);
+        return client;
+      }
+    }
+
+    // Fallback to environment variables
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    if (!accountSid || !authToken) {
+      console.warn('[SMS] Twilio credentials not configured');
+      return null;
+    }
+
+    return twilio(accountSid, authToken);
+  } catch (error) {
+    console.error('[SMS] Error getting Twilio client:', error);
     return null;
   }
+}
 
-  if (!twilioClient) {
-    twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+/**
+ * Get Twilio phone number for a user
+ */
+async function getTwilioPhoneNumber(userId?: number): Promise<string | null> {
+  try {
+    if (userId) {
+      const integrations = await db.getUserIntegrations(userId);
+      const twilioIntegration = integrations.find(i => i.provider === 'twilio');
+
+      if (twilioIntegration) {
+        const credentials = JSON.parse(decryptData(twilioIntegration.credentials));
+        return credentials.phoneNumber || null;
+      }
+    }
+
+    return process.env.TWILIO_PHONE_NUMBER || null;
+  } catch (error) {
+    console.error('[SMS] Error getting Twilio phone number:', error);
+    return null;
   }
-
-  return twilioClient;
 }
 
 /**
@@ -31,18 +79,21 @@ function getTwilioClient() {
  */
 export async function send2FASMS(
   phoneNumber: string,
-  code: string
+  code: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    const client = getTwilioClient();
-    if (!client || !TWILIO_PHONE_NUMBER) {
+    const client = await getTwilioClient(userId);
+    const fromNumber = await getTwilioPhoneNumber(userId);
+
+    if (!client || !fromNumber) {
       console.warn('[SMS] Cannot send SMS: Twilio not configured');
       return false;
     }
 
     const message = await client.messages.create({
       body: `Seu código de verificação Lume é: ${code}. Válido por 10 minutos.`,
-      from: TWILIO_PHONE_NUMBER,
+      from: fromNumber,
       to: phoneNumber,
     });
 
@@ -59,11 +110,14 @@ export async function send2FASMS(
  */
 export async function sendBackupCodesSMS(
   phoneNumber: string,
-  codes: string[]
+  codes: string[],
+  userId?: number
 ): Promise<boolean> {
   try {
-    const client = getTwilioClient();
-    if (!client || !TWILIO_PHONE_NUMBER) {
+    const client = await getTwilioClient(userId);
+    const fromNumber = await getTwilioPhoneNumber(userId);
+
+    if (!client || !fromNumber) {
       console.warn('[SMS] Cannot send SMS: Twilio not configured');
       return false;
     }
@@ -71,7 +125,7 @@ export async function sendBackupCodesSMS(
     const codesText = codes.slice(0, 3).join(', ');
     const message = await client.messages.create({
       body: `Seus códigos de backup Lume (primeiros 3): ${codesText}. Guarde em local seguro.`,
-      from: TWILIO_PHONE_NUMBER,
+      from: fromNumber,
       to: phoneNumber,
     });
 
@@ -90,11 +144,14 @@ export async function sendTransactionAlertSMS(
   phoneNumber: string,
   description: string,
   amount: number,
-  type: 'receita' | 'despesa'
+  type: 'receita' | 'despesa',
+  userId?: number
 ): Promise<boolean> {
   try {
-    const client = getTwilioClient();
-    if (!client || !TWILIO_PHONE_NUMBER) {
+    const client = await getTwilioClient(userId);
+    const fromNumber = await getTwilioPhoneNumber(userId);
+
+    if (!client || !fromNumber) {
       console.warn('[SMS] Cannot send SMS: Twilio not configured');
       return false;
     }
@@ -102,7 +159,7 @@ export async function sendTransactionAlertSMS(
     const typeText = type === 'receita' ? 'Entrada' : 'Saída';
     const message = await client.messages.create({
       body: `Lume: ${typeText} de R$ ${amount.toFixed(2)} - ${description}. Confirme se foi você.`,
-      from: TWILIO_PHONE_NUMBER,
+      from: fromNumber,
       to: phoneNumber,
     });
 
@@ -119,18 +176,21 @@ export async function sendTransactionAlertSMS(
  */
 export async function sendFraudAlertSMS(
   phoneNumber: string,
-  alertMessage: string
+  alertMessage: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    const client = getTwilioClient();
-    if (!client || !TWILIO_PHONE_NUMBER) {
+    const client = await getTwilioClient(userId);
+    const fromNumber = await getTwilioPhoneNumber(userId);
+
+    if (!client || !fromNumber) {
       console.warn('[SMS] Cannot send SMS: Twilio not configured');
       return false;
     }
 
     const message = await client.messages.create({
       body: `⚠️ ALERTA LUME: ${alertMessage}. Acesse o app para mais detalhes.`,
-      from: TWILIO_PHONE_NUMBER,
+      from: fromNumber,
       to: phoneNumber,
     });
 
@@ -140,4 +200,12 @@ export async function sendFraudAlertSMS(
     console.error('[SMS] Error sending fraud alert SMS:', error);
     return false;
   }
+}
+
+/**
+ * Clear Twilio client cache for a user (useful after credential update)
+ */
+export function clearTwilioCache(userId: number) {
+  twilioClients.delete(userId);
+  console.log(`[SMS] Twilio cache cleared for user ${userId}`);
 }

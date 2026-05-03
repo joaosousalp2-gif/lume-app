@@ -141,5 +141,5 @@
 - [x] Criar endpoints tRPC para gerenciar integrações (integrationsRouter)
 - [x] Adicionar testes para integrationsRouter (14 testes de criptografia e validação)
 - [x] Testar fluxo completo com credenciais do usuário (228 testes passando)
-- [ ] Integrar credenciais do usuário ao envio de SMS/Email (server/sms.ts e server/email.ts)
-- [ ] Salvar checkpoint final e publicar para produção
+- [x] Integrar credenciais do usuário ao envio de SMS/Email (server/sms.ts e server/email.ts)
+- [x] Salvar checkpoint final e publicar para produção
