@@ -132,3 +132,13 @@
 - [x] Adicionar endpoint disable para desabilitar 2FA
 - [x] Testar fluxo completo com atualização (214 testes passando)
 - [x] Salvar checkpoint final
+
+
+## Fase 16: Configuração de Integrações por Usuário
+- [x] Conectar TwoFactorVerification ao App.tsx
+- [x] Adicionar tabela de integrações ao banco de dados (userIntegrations)
+- [ ] Criar componente de configuração de integrações
+- [x] Criar endpoints tRPC para gerenciar integrações (integrationsRouter)
+- [ ] Integrar credenciais do usuário ao envio de SMS/Email
+- [x] Testar fluxo completo com credenciais do usuário (214 testes passando)
+- [ ] Salvar checkpoint final e publicar para produção

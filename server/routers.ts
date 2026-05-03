@@ -11,6 +11,7 @@ import { publicDataRouter } from "./routers/publicData";
 import { securityRouter } from "./routers/security";
 import { aiAdvancedRouter } from "./routers/aiAdvanced";
 import { auth2FARouter } from "./routers/auth2FA";
+import { integrationsRouter } from "./routers/integrations";
 
 export const appRouter = router({
   system: systemRouter,
@@ -198,6 +199,7 @@ export const appRouter = router({
   publicData: router(publicDataRouter),
   security: securityRouter,
   aiAdvanced: aiAdvancedRouter,
+  integrations: integrationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -425,4 +425,87 @@ export async function getUserTwoFAStatus(userId: number): Promise<{
     console.error("[Database] Failed to get 2FA status", error);
     return null;
   }
+}
+
+
+// User Integrations queries
+export async function addUserIntegration(
+  userId: number,
+  provider: string,
+  name: string,
+  credentials: string
+): Promise<number> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(userIntegrations).values({
+    userId,
+    provider: provider as any,
+    name,
+    credentials,
+  });
+
+  // Get the inserted ID
+  const inserted = await db
+    .select({ id: userIntegrations.id })
+    .from(userIntegrations)
+    .where(and(eq(userIntegrations.userId, userId), eq(userIntegrations.name, name)))
+    .limit(1);
+
+  return inserted[0]?.id || 0;
+}
+
+export async function getUserIntegrations(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(userIntegrations)
+    .where(eq(userIntegrations.userId, userId));
+}
+
+export async function getUserIntegrationById(userId: number, integrationId: number) {
+  const db = await getDb();
+  if (!db) {
+    return null;
+  }
+
+  const result = await db
+    .select()
+    .from(userIntegrations)
+    .where(
+      and(
+        eq(userIntegrations.userId, userId),
+        eq(userIntegrations.id, integrationId)
+      )
+    )
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateUserIntegration(
+  integrationId: number,
+  data: any
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db.update(userIntegrations).set(data).where(eq(userIntegrations.id, integrationId));
+}
+
+export async function deleteUserIntegration(integrationId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db.delete(userIntegrations).where(eq(userIntegrations.id, integrationId));
 }

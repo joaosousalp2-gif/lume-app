@@ -1,4 +1,4 @@
-/**
+/*
  * TwoFactorVerification — Lume
  * Página para verificação de código 2FA após login
  * Suporta Email, SMS e Authenticator
@@ -13,24 +13,24 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
-interface TwoFactorVerificationProps {
-  userId?: string;
-  method?: "email" | "sms" | "authenticator";
-  onSuccess?: () => void;
-}
-
-export default function TwoFactorVerification({
-  userId = "",
-  method = "email",
-  onSuccess = () => {},
-}: TwoFactorVerificationProps = {}) {
+export default function TwoFactorVerification() {
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [method, setMethod] = useState<"email" | "sms" | "authenticator">("email");
   const [, setLocation] = useLocation();
 
   const maxAttempts = 5;
   const isLocked = attempts >= maxAttempts;
+
+  // Get 2FA status
+  const { data: statusData } = trpc.auth.twoFA.getStatus.useQuery();
+
+  useEffect(() => {
+    if (statusData?.success) {
+      console.log("2FA Status:", statusData);
+    }
+  }, [statusData]);
 
   const verifyCode = async () => {
     if (!code.trim()) {
@@ -43,144 +43,125 @@ export default function TwoFactorVerification({
       return;
     }
 
+    if (isLocked) {
+      toast.error("Muitas tentativas. Tente novamente mais tarde.");
+      return;
+    }
+
     setIsVerifying(true);
     try {
-      const response = await fetch("/api/trpc/security.verify2FA", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          code,
-          method,
-        }),
+      const verifyMutation = trpc.auth.twoFA.verify.useMutation();
+      const result = await verifyMutation.mutateAsync({
+        code,
+        method,
       });
 
-      const data = await response.json();
-
-      if (data.result?.data?.isValid) {
-        toast.success("Código verificado com sucesso!");
-        onSuccess();
+      if (result.success && result.verified) {
+        toast.success("Verificação bem-sucedida!");
+        setCode("");
+        // Redirect to home after successful verification
+        setTimeout(() => setLocation("/"), 1500);
       } else {
+        toast.error(result.error || "Código inválido");
         setAttempts(attempts + 1);
-        if (attempts + 1 >= maxAttempts) {
-          toast.error("Muitas tentativas. Tente novamente mais tarde.");
-        } else {
-          toast.error(
-            `Código inválido. ${maxAttempts - attempts - 1} tentativas restantes.`
-          );
-        }
       }
     } catch (error) {
+      console.error("Verification error:", error);
       toast.error("Erro ao verificar código");
-      console.error(error);
+      setAttempts(attempts + 1);
     } finally {
       setIsVerifying(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isVerifying && !isLocked) {
-      verifyCode();
-    }
+  const handleSkip = () => {
+    toast.warning("2FA será necessário para acessar sua conta");
+    setLocation("/");
   };
 
-  const getMethodInfo = () => {
+  const getMethodIcon = () => {
     switch (method) {
       case "email":
-        return {
-          icon: <Mail className="w-8 h-8" />,
-          title: "Verificação por Email",
-          description: "Insira o código enviado para seu email",
-          placeholder: "000000",
-        };
+        return <Mail className="w-6 h-6" />;
       case "sms":
-        return {
-          icon: <Smartphone className="w-8 h-8" />,
-          title: "Verificação por SMS",
-          description: "Insira o código enviado para seu celular",
-          placeholder: "000000",
-        };
+        return <Smartphone className="w-6 h-6" />;
       case "authenticator":
-        return {
-          icon: <Key className="w-8 h-8" />,
-          title: "Verificação por Authenticator",
-          description: "Insira o código do seu aplicativo autenticador",
-          placeholder: "000000",
-        };
-      default:
-        return {
-          icon: <Shield className="w-8 h-8" />,
-          title: "Verificação",
-          description: "Insira o código de verificação",
-          placeholder: "000000",
-        };
+        return <Key className="w-6 h-6" />;
     }
   };
 
-  const methodInfo = getMethodInfo();
+  const getMethodLabel = () => {
+    switch (method) {
+      case "email":
+        return "Código enviado para seu email";
+      case "sms":
+        return "Código enviado por SMS";
+      case "authenticator":
+        return "Código do seu aplicativo de autenticação";
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-slate-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-slate-800 border-slate-700 shadow-2xl">
         <div className="p-8">
           {/* Header */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
-              {methodInfo.icon}
+          <div className="flex items-center justify-center mb-6">
+            <div className="bg-blue-500/20 p-3 rounded-lg">
+              <Shield className="w-8 h-8 text-blue-400" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white text-center">
-              {methodInfo.title}
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400 text-center mt-2">
-              {methodInfo.description}
-            </p>
+          </div>
+
+          <h1 className="text-2xl font-bold text-center text-white mb-2">
+            Verificação de Segurança
+          </h1>
+          <p className="text-center text-gray-300 mb-6">
+            Digite o código de verificação para continuar
+          </p>
+
+          {/* Method Selector */}
+          <div className="bg-slate-700/50 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {getMethodIcon()}
+                <div>
+                  <p className="text-sm text-gray-400">Método</p>
+                  <p className="text-white font-medium capitalize">{method}</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-300 mt-2">{getMethodLabel()}</p>
           </div>
 
           {/* Code Input */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-gray-200 mb-2">
               Código de Verificação
             </label>
             <Input
               type="text"
-              inputMode="numeric"
-              placeholder={methodInfo.placeholder}
+              placeholder="000000"
               value={code}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "").slice(0, 6);
-                setCode(value);
-              }}
-              onKeyPress={handleKeyPress}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
               disabled={isVerifying || isLocked}
-              className="text-center text-2xl tracking-widest font-mono"
               maxLength={6}
+              className="text-center text-2xl font-mono tracking-widest bg-slate-700 border-slate-600 text-white placeholder-gray-500"
             />
+            {isLocked && (
+              <p className="text-red-400 text-sm mt-2">
+                Muitas tentativas. Tente novamente mais tarde.
+              </p>
+            )}
+            <p className="text-gray-400 text-xs mt-2">
+              Tentativas restantes: {maxAttempts - attempts}
+            </p>
           </div>
-
-          {/* Attempts Warning */}
-          {attempts > 0 && (
-            <div className="mb-6 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-              <p className="text-sm text-yellow-900 dark:text-yellow-200">
-                ⚠️ {maxAttempts - attempts} tentativa(s) restante(s)
-              </p>
-            </div>
-          )}
-
-          {/* Locked Message */}
-          {isLocked && (
-            <div className="mb-6 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-900 dark:text-red-200">
-                ❌ Muitas tentativas. Tente novamente mais tarde.
-              </p>
-            </div>
-          )}
 
           {/* Verify Button */}
           <Button
             onClick={verifyCode}
-            disabled={isVerifying || isLocked || code.length < 6}
-            className="w-full mb-4"
-            size="lg"
+            disabled={isVerifying || isLocked || !code}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors mb-3"
           >
             {isVerifying ? (
               <>
@@ -192,24 +173,23 @@ export default function TwoFactorVerification({
             )}
           </Button>
 
-          {/* Back Button */}
+          {/* Skip Button */}
           <Button
+            onClick={handleSkip}
             variant="outline"
-            onClick={() => setLocation("/")}
-            disabled={isVerifying}
-            className="w-full"
+            className="w-full text-gray-300 border-slate-600 hover:bg-slate-700"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
 
           {/* Help Text */}
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <p className="text-sm text-blue-900 dark:text-blue-200">
-              <strong>💡 Dica:</strong> Se não recebeu o código, verifique sua
-              pasta de spam ou tente novamente em alguns minutos.
-            </p>
-          </div>
+          <p className="text-center text-gray-400 text-xs mt-6">
+            Não recebeu o código?{" "}
+            <button className="text-blue-400 hover:text-blue-300 underline">
+              Reenviar
+            </button>
+          </p>
         </div>
       </Card>
     </div>

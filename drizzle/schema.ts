@@ -221,3 +221,23 @@ export const aiRecommendations = mysqlTable("aiRecommendations", {
 
 export type AIRecommendation = typeof aiRecommendations.$inferSelect;
 export type InsertAIRecommendation = typeof aiRecommendations.$inferInsert;
+
+
+/**
+ * User Integrations table for storing third-party API credentials
+ * Credentials are encrypted at rest
+ */
+export const userIntegrations = mysqlTable("userIntegrations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  provider: mysqlEnum("provider", ["twilio", "sendgrid", "stripe", "openai"]).notNull(),
+  name: varchar("name", { length: 255 }).notNull(), // User-friendly name (e.g., "My Twilio Account")
+  credentials: text("credentials").notNull(), // JSON encrypted credentials
+  isActive: boolean("isActive").default(true).notNull(),
+  lastUsed: timestamp("lastUsed"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserIntegration = typeof userIntegrations.$inferSelect;
+export type InsertUserIntegration = typeof userIntegrations.$inferInsert;
