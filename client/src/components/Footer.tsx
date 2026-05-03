@@ -56,19 +56,19 @@ export default function Footer() {
                 Lume
               </span>
             </div>
-            <p className="text-gray-400 text-base leading-relaxed mb-6">
+            <p className="text-gray-200 text-base leading-relaxed mb-6">
               Iluminando a vida financeira de pessoas com mais de 60 anos. Simples, seguro e feito com carinho.
             </p>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <div className="flex items-center gap-2 text-gray-200 text-sm">
                 <Mail className="w-4 h-4 text-blue-400" />
                 <span>contato@lumeapp.com.br</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <div className="flex items-center gap-2 text-gray-200 text-sm">
                 <Phone className="w-4 h-4 text-green-400" />
                 <span>0800 123 4567 (gratuito)</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <div className="flex items-center gap-2 text-gray-200 text-sm">
                 <MapPin className="w-4 h-4 text-yellow-400" />
                 <span>Brasil</span>
               </div>
@@ -88,7 +88,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <button
                     onClick={() => handleNavClick(link.href)}
-                    className="text-gray-400 hover:text-white text-base transition-colors duration-200"
+                    className="text-gray-200 hover:text-white text-base transition-colors duration-200"
                   >
                     {link.label}
                   </button>
@@ -110,7 +110,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <button
                     onClick={() => handleNavClick(link.href)}
-                    className="text-gray-400 hover:text-white text-base transition-colors duration-200"
+                    className="text-gray-200 hover:text-white text-base transition-colors duration-200"
                   >
                     {link.label}
                   </button>
@@ -132,7 +132,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <button
                     onClick={() => handleNavClick(link.href)}
-                    className="text-gray-400 hover:text-white text-base transition-colors duration-200"
+                    className="text-gray-200 hover:text-white text-base transition-colors duration-200"
                   >
                     {link.label}
                   </button>
@@ -156,10 +156,10 @@ export default function Footer() {
         {/* Divider */}
         <div className="border-t border-gray-700 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-500 text-sm text-center md:text-left">
+            <p className="text-gray-700 text-sm text-center md:text-left">
               © 2026 Lume. Todos os direitos reservados. CNPJ: 00.000.000/0001-00
             </p>
-            <p className="text-gray-500 text-sm flex items-center gap-1">
+            <p className="text-gray-700 text-sm flex items-center gap-1">
               Feito com <Heart className="w-4 h-4 text-red-400" fill="currentColor" /> para a melhor geração
             </p>
           </div>

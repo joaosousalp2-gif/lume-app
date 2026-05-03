@@ -493,7 +493,7 @@ export default function LaunchModals({ isOpen, type, onClose }: LaunchModalsProp
                 className="w-full p-4 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none text-lg font-semibold resize-none"
                 rows={3}
               />
-              <p className="text-xs text-gray-500 mt-1">{formData.description.length}/200</p>
+              <p className="text-xs text-gray-700 mt-1">{formData.description.length}/200</p>
             </div>
 
             {/* Matched Rule */}

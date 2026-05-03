@@ -61,7 +61,7 @@ export default function DataSyncModal({ isOpen, onClose }: DataSyncModalProps) {
                     aria-valuemax={100}
                   />
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-700 dark:text-gray-200 mt-1">
                   {syncStatus.syncedItems} de {syncStatus.totalItems} itens sincronizados
                 </p>
               </div>
@@ -119,7 +119,7 @@ export default function DataSyncModal({ isOpen, onClose }: DataSyncModalProps) {
             </div>
 
             {syncStatus.lastSyncedAt && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-4">
+              <p className="text-xs text-gray-700 dark:text-gray-200 text-center mb-4">
                 Última sincronização: {new Date(syncStatus.lastSyncedAt).toLocaleString("pt-BR")}
               </p>
             )}

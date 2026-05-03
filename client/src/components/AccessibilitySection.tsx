@@ -133,7 +133,7 @@ export default function AccessibilitySection() {
           >
             "O Lume usa um português formal, porém simples e direto, evitando jargões técnicos. O tom é confiável, paciente, didático e empático."
           </p>
-          <p className="text-gray-500 text-lg">— Princípio de comunicação do Lume</p>
+          <p className="text-gray-700 text-lg">— Princípio de comunicação do Lume</p>
         </div>
       </div>
     </section>

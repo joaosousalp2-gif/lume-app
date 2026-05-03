@@ -225,7 +225,7 @@ export default function FraudProtection() {
                           )}
                         </div>
                         <p className="text-sm text-gray-600 mb-2">{item.reason}</p>
-                        <p className="text-xs text-gray-500">{item.reports} pessoas reportaram este número</p>
+                        <p className="text-xs text-gray-700">{item.reports} pessoas reportaram este número</p>
                       </div>
                       <button
                         onClick={() => reportNumber(item.number)}
@@ -313,7 +313,7 @@ export default function FraudProtection() {
                       {linkResult.details && (
                         <p className="text-xs text-gray-600 mb-2">Detalhes: {linkResult.details}</p>
                       )}
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-gray-700">
                         <span>Confiança: {linkResult.confidence}%</span>
                         <span>•</span>
                         <span>{linkResult.timestamp}</span>
@@ -339,7 +339,7 @@ export default function FraudProtection() {
                           <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">{item.timestamp}</p>
+                      <p className="text-xs text-gray-700 mt-1">{item.timestamp}</p>
                     </div>
                   ))}
                 </div>
@@ -369,11 +369,11 @@ export default function FraudProtection() {
                     <span className="text-3xl">{tip.icon}</span>
                     <div className="flex-1">
                       <h4 className="font-bold text-gray-900">{tip.title}</h4>
-                      <p className="text-xs text-gray-500">{tip.category}</p>
+                      <p className="text-xs text-gray-700">{tip.category}</p>
                     </div>
                   </div>
                   <p className="text-gray-700 mb-3">{tip.description}</p>
-                  <p className="text-xs text-gray-500">Publicado em {tip.date}</p>
+                  <p className="text-xs text-gray-700">Publicado em {tip.date}</p>
                 </div>
               ))}
             </div>

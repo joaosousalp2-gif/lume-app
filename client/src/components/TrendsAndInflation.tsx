@@ -106,7 +106,7 @@ export default function TrendsAndInflation() {
               <div className="p-6 rounded-xl bg-white border-2 border-purple-200">
                 <p className="text-sm text-gray-600 mb-2">Gasto Médio</p>
                 <p className="text-3xl font-bold text-gray-900">R$ {avgSpending.toFixed(2)}</p>
-                <p className="text-xs text-gray-500 mt-2">Últimos 6 meses</p>
+                <p className="text-xs text-gray-700 mt-2">Últimos 6 meses</p>
               </div>
 
               <div className={`p-6 rounded-xl bg-white border-2 ${spendingChange > 0 ? "border-red-200" : "border-green-200"}`}>
@@ -128,7 +128,7 @@ export default function TrendsAndInflation() {
                 <p className="text-3xl font-bold text-gray-900">
                   {spendingChange > 0 ? "📈 Aumento" : "📉 Redução"}
                 </p>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-700 mt-2">
                   {spendingChange > 0
                     ? "Seus gastos aumentaram este mês"
                     : "Seus gastos diminuíram este mês"}
@@ -208,7 +208,7 @@ export default function TrendsAndInflation() {
                     (Perda de R$ {(purchasingPower - parseFloat(calculatePurchasingPower())).toFixed(2)})
                   </p>
                 </div>
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="text-sm text-gray-700 mt-3">
                   Com uma inflação de {inflationRate}% ao ano, seu dinheiro perderá poder de compra ao longo do tempo.
                 </p>
               </div>

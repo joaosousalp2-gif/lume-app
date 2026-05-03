@@ -157,7 +157,7 @@ export default function CategorizationRules() {
                 onChange={(e) => setFormData({ ...formData, pattern: e.target.value })}
                 className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none font-semibold"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-700 mt-1">
                 A regra será aplicada quando a descrição contiver este padrão (case-insensitive)
               </p>
             </div>
@@ -210,7 +210,7 @@ export default function CategorizationRules() {
                 onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
                 className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:outline-none font-semibold"
               />
-              <p className="text-xs text-gray-500 mt-1">Padrão: 0. Use números maiores para priorizar</p>
+              <p className="text-xs text-gray-700 mt-1">Padrão: 0. Use números maiores para priorizar</p>
             </div>
 
             {/* Action Buttons */}
@@ -236,9 +236,9 @@ export default function CategorizationRules() {
       <div className="space-y-3">
         {rules.length === 0 ? (
           <div className="p-6 rounded-xl bg-gray-50 border-2 border-gray-200 text-center">
-            <AlertCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <AlertCircle className="w-8 h-8 text-gray-200 mx-auto mb-2" />
             <p className="text-gray-600 font-semibold">Nenhuma regra criada ainda</p>
-            <p className="text-sm text-gray-500 mt-1">Crie sua primeira regra para começar a categorizar automaticamente</p>
+            <p className="text-sm text-gray-700 mt-1">Crie sua primeira regra para começar a categorizar automaticamente</p>
           </div>
         ) : (
           rules.map((rule) => (
@@ -264,7 +264,7 @@ export default function CategorizationRules() {
                     {rule.isActive ? (
                       <CheckCircle className="w-5 h-5 text-green-600" />
                     ) : (
-                      <AlertCircle className="w-5 h-5 text-gray-400" />
+                      <AlertCircle className="w-5 h-5 text-gray-200" />
                     )}
                   </div>
 

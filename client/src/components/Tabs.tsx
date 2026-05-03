@@ -51,7 +51,7 @@ export const Tabs: React.FC<TabsProps> = ({
       container: 'flex gap-2 border-b border-gray-700 overflow-x-auto',
       tab: 'relative font-semibold transition-all duration-200 whitespace-nowrap',
       active: 'text-blue-400 border-b-2 border-blue-400',
-      inactive: 'text-gray-400 hover:text-gray-300',
+      inactive: 'text-gray-200 hover:text-gray-300',
     },
     pills: {
       container: 'flex gap-2 flex-wrap',
@@ -63,7 +63,7 @@ export const Tabs: React.FC<TabsProps> = ({
       container: 'flex gap-4 border-b border-gray-700 overflow-x-auto',
       tab: 'relative font-semibold transition-all duration-200 whitespace-nowrap pb-3',
       active: 'text-blue-400 border-b-2 border-blue-400 -mb-3',
-      inactive: 'text-gray-400 hover:text-gray-300',
+      inactive: 'text-gray-200 hover:text-gray-300',
     },
   };
 

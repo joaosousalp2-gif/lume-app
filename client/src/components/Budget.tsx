@@ -222,7 +222,7 @@ export default function Budget() {
           <div className="p-6 rounded-xl bg-gray-50 border-2 border-gray-200 text-center">
             <TrendingDown className="w-12 h-12 text-gray-300 mx-auto mb-2" />
             <p className="text-gray-600 font-semibold">Nenhum orçamento para este mês</p>
-            <p className="text-sm text-gray-500">Crie um orçamento para controlar seus gastos</p>
+            <p className="text-sm text-gray-700">Crie um orçamento para controlar seus gastos</p>
           </div>
         ) : (
           budgets.map((budget) => {

@@ -52,7 +52,7 @@ function TransactionCard({ transaction, showTime = false, onDelete }: { transact
           <p className="font-bold text-lg" style={{ color: isReceita ? "#22C55E" : "#ef4444" }}>
             {isReceita ? "+" : "-"}R$ {value.toFixed(2)}
           </p>
-          {showTime && <p className="text-xs text-gray-500">{transaction.time}</p>}
+          {showTime && <p className="text-xs text-gray-700">{transaction.time}</p>}
         </div>
         {onDelete && (
           <button
@@ -322,7 +322,7 @@ export default function LaunchesSection() {
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Buscar</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-3 top-3 w-5 h-5 text-gray-200" />
                   <input
                     type="text"
                     placeholder="Categoria ou descrição..."

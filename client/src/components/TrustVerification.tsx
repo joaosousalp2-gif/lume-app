@@ -101,7 +101,7 @@ export default function TrustVerification() {
               {loading ? "Buscando..." : "Buscar"}
             </button>
           </div>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-gray-700 mt-2">
             Exemplos: amazon.com.br, mercadolivre.com.br, aliexpress.com
           </p>
         </div>

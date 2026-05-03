@@ -237,7 +237,7 @@ export default function BankAccounts() {
           <div className="p-6 rounded-xl bg-gray-50 border-2 border-gray-200 text-center">
             <Wallet className="w-12 h-12 text-gray-300 mx-auto mb-2" />
             <p className="text-gray-600 font-semibold">Nenhuma conta cadastrada</p>
-            <p className="text-sm text-gray-500">Crie sua primeira conta para começar</p>
+            <p className="text-sm text-gray-700">Crie sua primeira conta para começar</p>
           </div>
         ) : (
           accounts.map((account) => {
@@ -252,10 +252,10 @@ export default function BankAccounts() {
                     </div>
                     <p className="text-sm text-gray-600">{typeInfo.label}</p>
                     {account.bankName && (
-                      <p className="text-xs text-gray-500 mt-1">Banco: {account.bankName}</p>
+                      <p className="text-xs text-gray-700 mt-1">Banco: {account.bankName}</p>
                     )}
                     {account.accountNumber && (
-                      <p className="text-xs text-gray-500">Conta: {account.accountNumber}</p>
+                      <p className="text-xs text-gray-700">Conta: {account.accountNumber}</p>
                     )}
                   </div>
 

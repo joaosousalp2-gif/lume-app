@@ -270,9 +270,9 @@ export default function GoalsSection() {
           </div>
         ) : (
           <div className="text-center py-12 bg-gray-50 rounded-xl">
-            <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <Target className="w-12 h-12 text-gray-200 mx-auto mb-3" />
             <p className="text-gray-600 font-semibold">Nenhuma meta criada ainda</p>
-            <p className="text-sm text-gray-500">Clique em "Adicionar Meta" para começar</p>
+            <p className="text-sm text-gray-700">Clique em "Adicionar Meta" para começar</p>
           </div>
         )}
       </div>

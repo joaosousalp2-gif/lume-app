@@ -179,7 +179,7 @@ export default function AccessibilitySettings() {
 
           {/* Help Text */}
           <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-gray-200">
               Essas configurações são salvas no seu navegador e aplicadas automaticamente.
             </p>
           </div>

@@ -342,7 +342,7 @@ export default function SpreadsheetsSection() {
                   </RechartsPie>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                <div className="h-[300px] flex items-center justify-center text-gray-700">
                   Nenhuma despesa neste período
                 </div>
               )}
@@ -408,9 +408,9 @@ export default function SpreadsheetsSection() {
         {/* Info */}
         {launches.length === 0 && (
           <div className="text-center py-12 bg-gray-50 rounded-xl">
-            <FileSpreadsheet className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <FileSpreadsheet className="w-12 h-12 text-gray-200 mx-auto mb-3" />
             <p className="text-gray-600 font-semibold">Nenhum lançamento registrado</p>
-            <p className="text-sm text-gray-500">Registre lançamentos na seção "Lançamentos Financeiros" para gerar planilhas</p>
+            <p className="text-sm text-gray-700">Registre lançamentos na seção "Lançamentos Financeiros" para gerar planilhas</p>
           </div>
         )}
       </div>

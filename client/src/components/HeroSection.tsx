@@ -162,7 +162,7 @@ export default function HeroSection() {
                   <Shield className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 font-medium">Proteção</p>
+                  <p className="text-xs text-gray-700 font-medium">Proteção</p>
                   <p className="text-sm font-bold text-gray-800">100% Seguro</p>
                 </div>
               </div>
@@ -172,7 +172,7 @@ export default function HeroSection() {
                 className="absolute bottom-16 -right-6 z-20 bg-white rounded-2xl shadow-xl px-4 py-3"
                 style={{ animation: "float 3s ease-in-out infinite", animationDelay: "1.5s" }}
               >
-                <p className="text-xs text-gray-500 font-medium">Saldo do mês</p>
+                <p className="text-xs text-gray-700 font-medium">Saldo do mês</p>
                 <p className="text-lg font-black" style={{ color: "#22C55E" }}>R$ 4.250,00</p>
               </div>
             </div>

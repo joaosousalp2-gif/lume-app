@@ -172,7 +172,7 @@ export default function SecurityDashboard() {
                 <div className="text-center py-12 bg-gray-50 rounded-xl">
                   <Shield className="w-12 h-12 text-green-400 mx-auto mb-3" />
                   <p className="text-gray-600 font-semibold">Nenhuma atividade suspeita detectada</p>
-                  <p className="text-sm text-gray-500">Seu sistema está seguro ✅</p>
+                  <p className="text-sm text-gray-700">Seu sistema está seguro ✅</p>
                 </div>
               )}
 
@@ -184,7 +184,7 @@ export default function SecurityDashboard() {
                     <div key={log.id} className="p-3 rounded-lg bg-white border border-gray-200 text-sm">
                       <div className="flex justify-between">
                         <span className="font-semibold text-gray-900">{log.description}</span>
-                        <span className="text-gray-500">{new Date(log.timestamp).toLocaleTimeString("pt-BR")}</span>
+                        <span className="text-gray-700">{new Date(log.timestamp).toLocaleTimeString("pt-BR")}</span>
                       </div>
                     </div>
                   ))}
@@ -272,7 +272,7 @@ export default function SecurityDashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-gray-50 rounded-xl">
-                    <Cloud className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <Cloud className="w-12 h-12 text-gray-200 mx-auto mb-3" />
                     <p className="text-gray-600 font-semibold">Nenhum backup criado ainda</p>
                   </div>
                 )}

@@ -36,7 +36,7 @@ export const WithContent: Story = {
       </CardHeader>
       <CardContent>
         <div className="text-3xl font-bold">R$ 4.250,00</div>
-        <p className="text-sm text-gray-500 mt-2">Atualizado hoje</p>
+        <p className="text-sm text-gray-700 mt-2">Atualizado hoje</p>
       </CardContent>
     </Card>
   ),

@@ -36,7 +36,7 @@ export default function CentralDashboard() {
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <p className="text-3xl font-bold text-green-600">R$ {(typeof data.totalReceitas === 'number' ? data.totalReceitas : parseFloat(data.totalReceitas || '0')).toFixed(2)}</p>
-            <p className="text-xs text-gray-500 mt-2">{data.receitas.length} lançamentos</p>
+            <p className="text-xs text-gray-700 mt-2">{data.receitas.length} lançamentos</p>
           </div>
 
           {/* Total Despesas */}
@@ -46,7 +46,7 @@ export default function CentralDashboard() {
               <TrendingDown className="w-5 h-5 text-red-600" />
             </div>
             <p className="text-3xl font-bold text-red-600">R$ {(typeof data.totalDespesas === 'number' ? data.totalDespesas : parseFloat(data.totalDespesas || '0')).toFixed(2)}</p>
-            <p className="text-xs text-gray-500 mt-2">{data.despesas.length} lançamentos</p>
+            <p className="text-xs text-gray-700 mt-2">{data.despesas.length} lançamentos</p>
           </div>
 
           {/* Saldo */}
@@ -58,7 +58,7 @@ export default function CentralDashboard() {
             <p className={`text-3xl font-bold ${data.saldo >= 0 ? "text-blue-600" : "text-orange-600"}`}>
               R$ {(typeof data.saldo === 'number' ? data.saldo : parseFloat(data.saldo || '0')).toFixed(2)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-700 mt-2">
               {data.saldo >= 0 ? "Superávit" : "Déficit"}
             </p>
           </div>
@@ -72,7 +72,7 @@ export default function CentralDashboard() {
             <p className="text-3xl font-bold text-purple-600">
               {(typeof data.totalReceitas === 'number' && data.totalReceitas > 0) ? ((data.saldo / data.totalReceitas) * 100).toFixed(1) : 0}%
             </p>
-            <p className="text-xs text-gray-500 mt-2">Do total de receitas</p>
+            <p className="text-xs text-gray-700 mt-2">Do total de receitas</p>
           </div>
         </div>
 
@@ -124,7 +124,7 @@ export default function CentralDashboard() {
               <div key={category} className="p-4 rounded-lg bg-gray-50 border border-gray-200">
                 <p className="text-sm font-semibold text-gray-600 mb-2">{category}</p>
                 <p className="text-2xl font-bold text-gray-900">R$ {(typeof value === 'number' ? value : parseFloat(value || '0')).toFixed(2)}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-700 mt-1">
                   {((typeof value === 'number' ? value : parseFloat(value || '0')) / ((typeof data.totalReceitas === 'number' ? data.totalReceitas : parseFloat(data.totalReceitas || '0')) + (typeof data.totalDespesas === 'number' ? data.totalDespesas : parseFloat(data.totalDespesas || '0'))) * 100).toFixed(1)}% do total
                 </p>
               </div>

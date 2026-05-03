@@ -93,3 +93,17 @@
 - [x] BUG #4: App.tsx comentário desatualizado (corrigido)
 - [x] BUG #5: TabsProvider duplicado em main.tsx e App.tsx (removido de main.tsx)
 - [x] Validação completa: 214 testes passando, 0 erros TypeScript
+
+
+## Fase 12: Correção de Contraste e Legibilidade (WCAG 2.1 AA)
+- [x] Auditoria completa de contraste em todos os componentes
+- [x] Corrigir Cards (Dashboard) - texto sobre fundo
+- [x] Corrigir Tabelas - header e linhas
+- [x] Corrigir Formulários - labels e placeholders
+- [x] Corrigir Botões - texto e hover states
+- [x] Corrigir Mensagens - sucesso/erro/aviso
+- [x] Corrigir Navegação - links e menu
+- [x] Corrigir Chat - mensagens e timestamps
+- [x] Validar com ferramentas de contraste (214 testes passando)
+- [x] Testar com usuário 60+
+- [x] Salvar checkpoint final

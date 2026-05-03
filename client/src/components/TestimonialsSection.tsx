@@ -201,7 +201,7 @@ export default function TestimonialsSection() {
                 </div>
                 <div>
                   <p className="font-bold text-gray-800 text-sm">{t.name}</p>
-                  <p className="text-gray-500 text-sm">{t.location}</p>
+                  <p className="text-gray-700 text-sm">{t.location}</p>
                 </div>
               </div>
             </div>
