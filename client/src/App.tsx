@@ -12,14 +12,16 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { TabsProvider } from "./contexts/TabsContext";
 import Home from "./pages/Home";
 import ChatAssistant from "./pages/ChatAssistant";
+// import TwoFactorVerification from "./pages/TwoFactorVerification";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/dashboard/chat"} component={ChatAssistant} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={Home} />
+      <Route path="/dashboard/chat" component={ChatAssistant} />
+      {/* <Route path="/auth/2fa" component={TwoFactorVerification} /> */}
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );

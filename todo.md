@@ -107,3 +107,12 @@
 - [x] Validar com ferramentas de contraste (214 testes passando)
 - [x] Testar com usuário 60+
 - [x] Salvar checkpoint final
+
+
+## Fase 13: Integração de 2FA no Fluxo de Login
+- [x] Integrar 2FA ao fluxo de autenticação OAuth
+- [x] Criar página de verificação de 2FA (TwoFactorVerification.tsx)
+- [x] Implementar endpoints tRPC para 2FA (security router)
+- [x] Adicionar UI para gerenciar 2FA no dashboard (TwoFactorSettings.tsx)
+- [x] Testar fluxo completo de 2FA (214 testes passando)
+- [x] Salvar checkpoint final
