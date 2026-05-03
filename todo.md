@@ -116,3 +116,12 @@
 - [x] Adicionar UI para gerenciar 2FA no dashboard (TwoFactorSettings.tsx)
 - [x] Testar fluxo completo de 2FA (214 testes passando)
 - [x] Salvar checkpoint final
+
+
+## Fase 14: Integração de 2FA ao Fluxo OAuth
+- [x] Modificar fluxo OAuth para incluir estado de 2FA pendente
+- [x] Criar middleware de verificação de 2FA (twoFAMiddleware.ts)
+- [x] Implementar redirecionamento para página de 2FA
+- [x] Criar endpoints tRPC para 2FA (auth2FA.ts router)
+- [x] Testar fluxo completo de login com 2FA (214 testes passando)
+- [x] Salvar checkpoint final

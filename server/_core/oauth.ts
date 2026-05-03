@@ -36,6 +36,11 @@ export function registerOAuthRoutes(app: Express) {
         lastSignedIn: new Date(),
       });
 
+      // Check if user has 2FA enabled
+      const user = await db.getUserByOpenId(userInfo.openId);
+      const has2FAEnabled = user?.twoFARequired || false;
+
+      // Create session token
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",
         expiresInMs: ONE_YEAR_MS,
@@ -44,7 +49,12 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      res.redirect(302, "/");
+      // If 2FA is required, redirect to 2FA verification page
+      if (has2FAEnabled && !user?.twoFAVerified) {
+        res.redirect(302, `/auth/2fa?userId=${user?.id}&method=email`);
+      } else {
+        res.redirect(302, "/");
+      }
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });

@@ -10,6 +10,7 @@ import { syncRouter } from "./routers/sync";
 import { publicDataRouter } from "./routers/publicData";
 import { securityRouter } from "./routers/security";
 import { aiAdvancedRouter } from "./routers/aiAdvanced";
+import { auth2FARouter } from "./routers/auth2FA";
 
 export const appRouter = router({
   system: systemRouter,
@@ -22,6 +23,7 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    twoFA: auth2FARouter,
   }),
 
   trust: router({
