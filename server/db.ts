@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, userWebhooks, webhookEvents, UserWebhook, InsertUserWebhook, WebhookEvent, InsertWebhookEvent, twoFAMethods } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -87,6 +87,50 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserEmail(userId: number): Promise<string | null> {
+  const user = await getUserById(userId);
+  return user?.email || null;
+}
+
+export async function getUserPhoneNumber(userId: number): Promise<string | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db
+      .select()
+      .from(twoFAMethods)
+      .where(
+        and(
+          eq(twoFAMethods.userId, userId),
+          eq(twoFAMethods.method, "sms")
+        )
+      )
+      .limit(1);
+
+    if (result.length > 0) {
+      // phoneNumber is stored directly in the twoFAMethods table
+      return result[0].phoneNumber || null;
+    }
+  } catch (error) {
+    console.error("[Database] Error getting user phone number:", error);
+  }
+
+  return null;
 }
 
 // Launches queries
@@ -508,4 +552,183 @@ export async function deleteUserIntegration(integrationId: number): Promise<void
   }
 
   await db.delete(userIntegrations).where(eq(userIntegrations.id, integrationId));
+}
+
+
+// ============================================================================
+// Webhooks Helpers
+// ============================================================================
+
+export async function createUserWebhook(
+  data: InsertUserWebhook
+): Promise<UserWebhook> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(userWebhooks).values(data);
+  const webhookId = result[0].insertId;
+
+  const webhook = await db
+    .select()
+    .from(userWebhooks)
+    .where(eq(userWebhooks.id, Number(webhookId)))
+    .limit(1);
+
+  if (!webhook.length) {
+    throw new Error("Failed to create webhook");
+  }
+
+  return webhook[0];
+}
+
+export async function getUserWebhooks(userId: number): Promise<UserWebhook[]> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return db
+    .select()
+    .from(userWebhooks)
+    .where(eq(userWebhooks.userId, userId));
+}
+
+export async function getUserWebhook(
+  webhookId: number,
+  userId: number
+): Promise<UserWebhook | null> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const webhook = await db
+    .select()
+    .from(userWebhooks)
+    .where(and(eq(userWebhooks.id, webhookId), eq(userWebhooks.userId, userId)))
+    .limit(1);
+
+  return webhook.length > 0 ? webhook[0] : null;
+}
+
+export async function updateUserWebhook(
+  webhookId: number,
+  data: Partial<InsertUserWebhook>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(userWebhooks)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(userWebhooks.id, webhookId));
+}
+
+export async function deleteUserWebhook(webhookId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Delete associated events first
+  await db
+    .delete(webhookEvents)
+    .where(eq(webhookEvents.webhookId, webhookId));
+
+  // Delete webhook
+  await db.delete(userWebhooks).where(eq(userWebhooks.id, webhookId));
+}
+
+export async function createWebhookEvent(
+  data: InsertWebhookEvent
+): Promise<WebhookEvent> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(webhookEvents).values(data);
+  const eventId = result[0].insertId;
+
+  const event = await db
+    .select()
+    .from(webhookEvents)
+    .where(eq(webhookEvents.id, Number(eventId)))
+    .limit(1);
+
+  if (!event.length) {
+    throw new Error("Failed to create webhook event");
+  }
+
+  return event[0];
+}
+
+export async function getWebhookEvents(
+  webhookId: number,
+  limit: number = 50
+): Promise<WebhookEvent[]> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return db
+    .select()
+    .from(webhookEvents)
+    .where(eq(webhookEvents.webhookId, webhookId))
+    .orderBy(desc(webhookEvents.createdAt))
+    .limit(limit);
+}
+
+export async function getPendingWebhookEvents(): Promise<WebhookEvent[]> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return db
+    .select()
+    .from(webhookEvents)
+    .where(eq(webhookEvents.deliveryStatus, "pending"))
+    .orderBy(webhookEvents.createdAt);
+}
+
+export async function updateWebhookEvent(
+  eventId: number,
+  data: Partial<InsertWebhookEvent>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(webhookEvents)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(webhookEvents.id, eventId));
+}
+
+export async function getWebhooksByEventType(
+  userId: number,
+  eventType: string
+): Promise<UserWebhook[]> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return db
+    .select()
+    .from(userWebhooks)
+    .where(
+      and(
+        eq(userWebhooks.userId, userId),
+        eq(userWebhooks.eventType, eventType as any),
+        eq(userWebhooks.isActive, true)
+      )
+    );
 }

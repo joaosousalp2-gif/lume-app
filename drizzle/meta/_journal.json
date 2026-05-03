@@ -64,6 +64,13 @@
       "when": 1777768317290,
       "tag": "0008_hot_overlord",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1777782080154,
+      "tag": "0009_hesitant_lethal_legion",
+      "breakpoints": true
     }
   ]
 }
