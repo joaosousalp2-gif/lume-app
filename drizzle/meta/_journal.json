@@ -71,13 +71,6 @@
       "when": 1777782080154,
       "tag": "0009_hesitant_lethal_legion",
       "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "5",
-      "when": 1777845131868,
-      "tag": "0010_curious_frank_castle",
-      "breakpoints": true
     }
   ]
 }

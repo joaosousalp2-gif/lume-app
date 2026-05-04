@@ -1,6 +1,6 @@
-import { eq, and, desc, like } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, userWebhooks, webhookEvents, UserWebhook, InsertUserWebhook, WebhookEvent, InsertWebhookEvent, twoFAMethods, budgetLimitExceededNotifications, BudgetLimitExceededNotification, InsertBudgetLimitExceededNotification } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, userWebhooks, webhookEvents, UserWebhook, InsertUserWebhook, WebhookEvent, InsertWebhookEvent, twoFAMethods } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -139,26 +139,6 @@ export async function getLaunchesByUserId(userId: number) {
   if (!db) return [];
 
   return await db.select().from(launches).where(eq(launches.userId, userId));
-}
-
-export async function getLaunchesByUserCategoryMonth(
-  userId: number,
-  category: string,
-  month: string
-) {
-  const db = await getDb();
-  if (!db) return [];
-
-  return await db
-    .select()
-    .from(launches)
-    .where(
-      and(
-        eq(launches.userId, userId),
-        eq(launches.category, category),
-        like(launches.date, `${month}%`)
-      )
-    );
 }
 
 export async function createLaunch(launch: typeof launches.$inferInsert) {
@@ -751,92 +731,4 @@ export async function getWebhooksByEventType(
         eq(userWebhooks.isActive, true)
       )
     );
-}
-
-
-// ===== Budget Limit Exceeded Notifications =====
-
-export async function createBudgetLimitExceededNotification(
-  notification: InsertBudgetLimitExceededNotification
-): Promise<BudgetLimitExceededNotification | null> {
-  const db = await getDb();
-  if (!db) return null;
-
-  try {
-    const result = await db
-      .insert(budgetLimitExceededNotifications)
-      .values(notification);
-    return notification as BudgetLimitExceededNotification;
-  } catch (error) {
-    console.error("[Database] Error creating budget limit notification:", error);
-    return null;
-  }
-}
-
-export async function getBudgetLimitExceededNotification(
-  userId: number,
-  budgetId: number,
-  month: string
-): Promise<BudgetLimitExceededNotification | null> {
-  const db = await getDb();
-  if (!db) return null;
-
-  try {
-    const result = await db
-      .select()
-      .from(budgetLimitExceededNotifications)
-      .where(
-        and(
-          eq(budgetLimitExceededNotifications.userId, userId),
-          eq(budgetLimitExceededNotifications.budgetId, budgetId),
-          eq(budgetLimitExceededNotifications.month, month)
-        )
-      )
-      .limit(1);
-
-    return result.length > 0 ? result[0] : null;
-  } catch (error) {
-    console.error("[Database] Error getting budget limit notification:", error);
-    return null;
-  }
-}
-
-export async function updateBudgetLimitExceededNotification(
-  id: number,
-  data: Partial<InsertBudgetLimitExceededNotification>
-): Promise<void> {
-  const db = await getDb();
-  if (!db) return;
-
-  try {
-    await db
-      .update(budgetLimitExceededNotifications)
-      .set(data)
-      .where(eq(budgetLimitExceededNotifications.id, id));
-  } catch (error) {
-    console.error("[Database] Error updating budget limit notification:", error);
-  }
-}
-
-export async function getBudgetLimitExceededNotificationsByUser(
-  userId: number,
-  month?: string
-): Promise<BudgetLimitExceededNotification[]> {
-  const db = await getDb();
-  if (!db) return [];
-
-  try {
-    const conditions = [eq(budgetLimitExceededNotifications.userId, userId)];
-    if (month) {
-      conditions.push(eq(budgetLimitExceededNotifications.month, month));
-    }
-
-    return await db
-      .select()
-      .from(budgetLimitExceededNotifications)
-      .where(and(...conditions));
-  } catch (error) {
-    console.error("[Database] Error getting budget limit notifications:", error);
-    return [];
-  }
 }

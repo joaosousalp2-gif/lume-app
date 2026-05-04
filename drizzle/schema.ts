@@ -288,27 +288,3 @@ export const webhookEvents = mysqlTable("webhookEvents", {
 
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type InsertWebhookEvent = typeof webhookEvents.$inferInsert;
-
-
-/**
- * Budget Limit Exceeded Notifications table for tracking when budget limits are exceeded
- * Used to prevent duplicate webhook notifications for the same budget
- */
-export const budgetLimitExceededNotifications = mysqlTable("budgetLimitExceededNotifications", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull().references(() => users.id),
-  budgetId: int("budgetId").notNull().references(() => budgets.id),
-  category: varchar("category", { length: 64 }).notNull(),
-  month: varchar("month", { length: 7 }).notNull(),
-  exceededAt: timestamp("exceededAt").defaultNow().notNull(),
-  spentAmount: varchar("spentAmount", { length: 20 }).notNull(),
-  limitAmount: varchar("limitAmount", { length: 20 }).notNull(),
-  percentage: int("percentage").notNull(),
-  webhookDispatched: boolean("webhookDispatched").default(false).notNull(),
-  dispatchedAt: timestamp("dispatchedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type BudgetLimitExceededNotification = typeof budgetLimitExceededNotifications.$inferSelect;
-export type InsertBudgetLimitExceededNotification = typeof budgetLimitExceededNotifications.$inferInsert;
