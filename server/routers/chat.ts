@@ -281,12 +281,24 @@ Linguagem clara, acessível, sem jargão técnico.`;
         { role: "user", content: userMessage },
       ];
 
-      const response = await invokeLLM({
-        messages: messages as any,
-      });
+      let assistantMessage = "Desculpe, não consegui processar sua mensagem.";
+      
+      try {
+        const response = await invokeLLM({
+          messages: messages as any,
+        });
 
-      const assistantContent = response.choices?.[0]?.message?.content;
-      const assistantMessage = typeof assistantContent === "string" ? assistantContent : "Desculpe, não consegui processar sua mensagem.";
+        const assistantContent = response.choices?.[0]?.message?.content;
+        if (typeof assistantContent === "string" && assistantContent.trim()) {
+          assistantMessage = assistantContent;
+        } else {
+          console.error("LLM response invalid:", response);
+          assistantMessage = "Desculpe, recebi uma resposta inválida da IA. Tente novamente.";
+        }
+      } catch (llmError) {
+        console.error("LLM Error:", llmError);
+        assistantMessage = `Erro ao processar: ${llmError instanceof Error ? llmError.message : "Erro desconhecido"}`;
+      }
 
       // 6. Save assistant response
       await saveChatMessage(userId, "assistant", assistantMessage);
