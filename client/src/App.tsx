@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import ChatAssistant from "./pages/ChatAssistant";
 import TwoFactorVerification from "./pages/TwoFactorVerification";
 import UserIntegrationsSettings from "./pages/UserIntegrationsSettings";
+import WebhooksSettings from "./pages/WebhooksSettings";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/dashboard/chat" component={ChatAssistant} />
       <Route path="/auth/2fa" component={TwoFactorVerification} />
       <Route path="/settings/integrations" component={UserIntegrationsSettings} />
+      <Route path="/settings/webhooks" component={WebhooksSettings} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -143,3 +143,48 @@
 - [x] Testar fluxo completo com credenciais do usuário (228 testes passando)
 - [x] Integrar credenciais do usuário ao envio de SMS/Email (server/sms.ts e server/email.ts)
 - [x] Salvar checkpoint final e publicar para produção
+
+
+## Fase 17: Sistema de Webhooks para Eventos Críticos
+- [x] Planejar arquitetura de webhooks e tipos de eventos
+- [x] Criar tabelas userWebhooks e webhookEvents no banco de dados
+- [x] Implementar endpoints tRPC para gerenciar webhooks (create, list, delete, update, getEvents)
+- [x] Criar webhookDispatcher.ts para disparar eventos e notificações
+- [x] Integrar webhooks ao fluxo de detecção de fraude (aiAdvanced.ts)
+- [x] Integrar webhooks ao fluxo de limite de orçamento (routers.ts)
+- [x] Criar UI WebhooksSettings.tsx para configurar webhooks
+- [x] Adicionar rota /settings/webhooks ao App.tsx
+- [x] Escrever testes para sistema de webhooks (16 testes, 12 skipped)
+- [x] Validar 228 testes passando, 0 erros TypeScript
+- [x] Salvar checkpoint final
+
+
+## Fase 18: Implementacao Real de SMS/Email no Webhook Dispatcher
+- [x] Substituir placeholders no webhookDispatcher por implementacao real
+- [x] Integrar envio real de SMS com Twilio (sendFraudAlertSMS, sendTransactionAlertSMS)
+- [x] Integrar envio real de Email com SendGrid (sendFraudAlertEmail, sendTransactionEmail, sendRecommendationEmail)
+- [x] Implementar retry logic com MAX_DELIVERY_ATTEMPTS=3 e RETRY_DELAY=5min
+- [x] Adicionar timeout de 30s para deliveries
+- [x] Implementar tratamento de erros robusto com logging
+- [x] Adicionar funcao clearUserCredentialCaches para limpar caches apos atualizacao
+- [x] Criar testes para webhookDispatcher com mocks de SMS/Email (30+ testes)
+- [x] Validar 250 testes passando, 0 erros TypeScript
+
+
+## Fase 19: Deteccao Real de Limite de Orcamento para Webhooks
+- [x] Analisar logica atual de orcamento e identificar onde webhooks sao disparados
+- [x] Criar funcao de validacao de limite de orcamento com comparacao de gastos (budgetValidator.ts)
+- [x] Implementar rastreamento de estado de limite (tabela budgetLimitExceededNotifications)
+- [x] Integrar validacao ao fluxo de atualizacao de orcamento (routers.ts)
+- [x] Adicionar testes para validacao de limite (22 testes, todos passando)
+- [x] Validar integracao completa (272 testes passando, 0 erros TypeScript)
+- [x] Salvar checkpoint final
+
+
+## Fase 20: Integração do Agente de IA na Página Inicial
+- [x] Analisar estrutura da página Home.tsx
+- [x] Criar componente FloatingAIChat com chat flutuante
+- [x] Integrar FloatingAIChat na página Home
+- [x] Adicionar estilos responsivos (mobile/desktop)
+- [x] Testar funcionamento (272 testes passando, 0 erros TypeScript)
+- [x] Validar integração com AIChatBox

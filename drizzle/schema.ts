@@ -241,3 +241,74 @@ export const userIntegrations = mysqlTable("userIntegrations", {
 
 export type UserIntegration = typeof userIntegrations.$inferSelect;
 export type InsertUserIntegration = typeof userIntegrations.$inferInsert;
+
+
+/**
+ * User Webhooks table for storing webhook configurations
+ * Users can configure webhooks to receive notifications via SMS or Email
+ */
+export const userWebhooks = mysqlTable("userWebhooks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  name: varchar("name", { length: 255 }).notNull(), // User-friendly name (e.g., "Fraude Alert")
+  eventType: mysqlEnum("eventType", [
+    "fraud_detected",
+    "budget_limit_exceeded",
+    "large_transaction",
+    "unusual_activity",
+    "security_alert",
+    "recommendation_available",
+  ]).notNull(),
+  notificationMethod: mysqlEnum("notificationMethod", ["sms", "email"]).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserWebhook = typeof userWebhooks.$inferSelect;
+export type InsertUserWebhook = typeof userWebhooks.$inferInsert;
+
+/**
+ * Webhook Events table for storing event history and delivery status
+ */
+export const webhookEvents = mysqlTable("webhookEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  webhookId: int("webhookId").notNull().references(() => userWebhooks.id),
+  userId: int("userId").notNull().references(() => users.id),
+  eventType: varchar("eventType", { length: 64 }).notNull(),
+  eventData: text("eventData").notNull(), // JSON with event details
+  deliveryStatus: mysqlEnum("deliveryStatus", ["pending", "sent", "failed"]).default("pending").notNull(),
+  deliveryAttempts: int("deliveryAttempts").default(0).notNull(),
+  lastAttemptAt: timestamp("lastAttemptAt"),
+  sentAt: timestamp("sentAt"),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WebhookEvent = typeof webhookEvents.$inferSelect;
+export type InsertWebhookEvent = typeof webhookEvents.$inferInsert;
+
+
+/**
+ * Budget Limit Exceeded Notifications table for tracking when budget limits are exceeded
+ * Used to prevent duplicate webhook notifications for the same budget
+ */
+export const budgetLimitExceededNotifications = mysqlTable("budgetLimitExceededNotifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  budgetId: int("budgetId").notNull().references(() => budgets.id),
+  category: varchar("category", { length: 64 }).notNull(),
+  month: varchar("month", { length: 7 }).notNull(),
+  exceededAt: timestamp("exceededAt").defaultNow().notNull(),
+  spentAmount: varchar("spentAmount", { length: 20 }).notNull(),
+  limitAmount: varchar("limitAmount", { length: 20 }).notNull(),
+  percentage: int("percentage").notNull(),
+  webhookDispatched: boolean("webhookDispatched").default(false).notNull(),
+  dispatchedAt: timestamp("dispatchedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BudgetLimitExceededNotification = typeof budgetLimitExceededNotifications.$inferSelect;
+export type InsertBudgetLimitExceededNotification = typeof budgetLimitExceededNotifications.$inferInsert;

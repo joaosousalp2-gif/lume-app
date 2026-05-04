@@ -11,10 +11,12 @@ import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import Tabs, { TabItem } from "@/components/Tabs";
 import { useTabsContext } from "@/contexts/TabsContext";
+import FloatingAIChat from "@/components/FloatingAIChat";
 import { Wallet, Shield, BarChart3, Brain, Download, CheckCircle2 } from "lucide-react";
 
 // Lazy load seções
 const SecuritySection = lazy(() => import("@/components/SecuritySection"));
+const AIChatBox = lazy(() => import("@/components/AIChatBox").then(m => ({ default: m.AIChatBox })));
 const HowItWorksSection = lazy(() => import("@/components/HowItWorksSection"));
 const AccessibilitySection = lazy(() => import("@/components/AccessibilitySection"));
 const LaunchesSection = lazy(() => import("@/components/LaunchesSection"));
@@ -144,6 +146,28 @@ export default function Home() {
         </div>
       ),
     },
+    {
+      id: "chat",
+      label: "Chat com IA",
+      icon: <Brain className="w-5 h-5" />,
+      content: (
+        <div className="space-y-8">
+          <Suspense fallback={<SectionPlaceholder />}>
+            <div className="bg-slate-800 rounded-lg p-8 shadow-lg border border-slate-700">
+              <AIChatBox
+                messages={[{
+                  role: "assistant",
+                  content: "Olá! 👋 Sou o assistente IA do Lume. Faça suas perguntas sobre gestão financeira, segurança, ou qualquer funcionalidade do app!"
+                }]}
+                onSendMessage={() => {}}
+                height="600px"
+                placeholder="Digite sua pergunta..."
+              />
+            </div>
+          </Suspense>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -151,6 +175,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <FeaturesSection />
+      <FloatingAIChat />
 
       {/* Main Content with Tabs */}
       <div className="w-full bg-gradient-to-b from-slate-900 to-slate-950 py-12">
