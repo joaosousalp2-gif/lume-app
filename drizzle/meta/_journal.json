@@ -64,41 +64,6 @@
       "when": 1777768317290,
       "tag": "0008_hot_overlord",
       "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "5",
-      "when": 1777782080154,
-      "tag": "0009_hesitant_lethal_legion",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "5",
-      "when": 1777845131868,
-      "tag": "0010_curious_frank_castle",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "5",
-      "when": 1777895077395,
-      "tag": "0011_curved_lilith",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "5",
-      "when": 1777895147271,
-      "tag": "0012_dear_molecule_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "5",
-      "when": 1777895225767,
-      "tag": "0013_warm_black_bird",
-      "breakpoints": true
     }
   ]
 }

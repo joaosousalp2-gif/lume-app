@@ -12,7 +12,6 @@ import { securityRouter } from "./routers/security";
 import { aiAdvancedRouter } from "./routers/aiAdvanced";
 import { auth2FARouter } from "./routers/auth2FA";
 import { integrationsRouter } from "./routers/integrations";
-import { dispatchWebhookEvent } from "./webhookDispatcher";
 
 export const appRouter = router({
   system: systemRouter,
@@ -150,19 +149,7 @@ export const appRouter = router({
         month: z.string().optional(),
         alertThresholds: z.string().optional(),
       }))
-      .mutation(async ({ ctx, input }) => {
-        await updateBudget(input.id, input);
-        // Only dispatch webhook if limit was actually exceeded
-        if (input.limit && input.category && input.month) {
-          const { validateAndDispatchBudgetWebhook } = await import("./budgetValidator");
-          await validateAndDispatchBudgetWebhook(
-            ctx.user.id,
-            input.category,
-            input.month
-          ).catch(err => console.error("[BudgetValidator] Error:", err));
-        }
-        return { success: true };
-      }),
+      .mutation(({ input }) => updateBudget(input.id, input)),
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(({ input }) => deleteBudget(input.id)),
