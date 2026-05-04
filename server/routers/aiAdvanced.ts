@@ -2,7 +2,7 @@
  * Advanced AI router for financial recommendations
  */
 
-import { protectedProcedure, router } from "../\_core/trpc";
+import { protectedProcedure, router } from "../_core/trpc";
 import { z } from "zod";
 import {
   generateEconomyRecommendations,
@@ -12,7 +12,7 @@ import {
   saveRecommendation,
   getUserRecommendations,
 } from "../aiRecommendations";
-import { dispatchWebhookEvent } from "../webhookDispatcher";
+
 export const aiAdvancedRouter = router({
   /**
    * Get economy recommendations (corte de gastos)
@@ -96,14 +96,6 @@ export const aiAdvancedRouter = router({
           alert,
           "alta"
         );
-
-        // Dispatch webhook event for fraud detection
-        if (alerts.length > 0) {
-          await dispatchWebhookEvent(ctx.user.id, "fraud_detected", {
-            description: alert,
-            severity: "high",
-          });
-        }
       }
 
       return {
