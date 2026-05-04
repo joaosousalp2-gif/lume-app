@@ -11,6 +11,7 @@ import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import Tabs, { TabItem } from "@/components/Tabs";
 import { useTabsContext } from "@/contexts/TabsContext";
+import FloatingAIChat from "@/components/FloatingAIChat";
 import { Wallet, Shield, BarChart3, Brain, Download, CheckCircle2 } from "lucide-react";
 
 // Lazy load seções
@@ -151,6 +152,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <FeaturesSection />
+      <FloatingAIChat />
 
       {/* Main Content with Tabs */}
       <div className="w-full bg-gradient-to-b from-slate-900 to-slate-950 py-12">
