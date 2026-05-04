@@ -152,14 +152,14 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         await updateBudget(input.id, input);
-        if (input.limit && input.category) {
-          const limitValue = parseFloat(input.limit);
-          await dispatchWebhookEvent(ctx.user.id, "budget_limit_exceeded", {
-            category: input.category,
-            limit: limitValue,
-            spent: 0,
-            percentage: 0,
-          }).catch(err => console.error("[Webhooks] Error:", err));
+        // Only dispatch webhook if limit was actually exceeded
+        if (input.limit && input.category && input.month) {
+          const { validateAndDispatchBudgetWebhook } = await import("./budgetValidator");
+          await validateAndDispatchBudgetWebhook(
+            ctx.user.id,
+            input.category,
+            input.month
+          ).catch(err => console.error("[BudgetValidator] Error:", err));
         }
         return { success: true };
       }),

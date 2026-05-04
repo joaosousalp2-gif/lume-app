@@ -169,3 +169,13 @@
 - [x] Adicionar funcao clearUserCredentialCaches para limpar caches apos atualizacao
 - [x] Criar testes para webhookDispatcher com mocks de SMS/Email (30+ testes)
 - [x] Validar 250 testes passando, 0 erros TypeScript
+
+
+## Fase 19: Deteccao Real de Limite de Orcamento para Webhooks
+- [x] Analisar logica atual de orcamento e identificar onde webhooks sao disparados
+- [x] Criar funcao de validacao de limite de orcamento com comparacao de gastos (budgetValidator.ts)
+- [x] Implementar rastreamento de estado de limite (tabela budgetLimitExceededNotifications)
+- [x] Integrar validacao ao fluxo de atualizacao de orcamento (routers.ts)
+- [x] Adicionar testes para validacao de limite (22 testes, todos passando)
+- [x] Validar integracao completa (272 testes passando, 0 erros TypeScript)
+- [x] Salvar checkpoint final
