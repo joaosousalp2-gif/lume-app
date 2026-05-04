@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Lightbulb, Menu, X } from "lucide-react";
+import { Lightbulb, Menu, X, Brain } from "lucide-react";
 import { useTabsContext } from "@/contexts/TabsContext";
 import ThemeToggle from "./ThemeToggle";
 
@@ -27,7 +27,6 @@ const navLinks: NavLink[] = [
   { href: "#planilhas", label: "Planilhas", tab: "financeiro" },
   { href: "#fraud-protection", label: "Proteção", tab: "seguranca" },
   { href: "#ai-analysis", label: "IA", tab: "analise" },
-  { href: "/dashboard/chat", label: "Agente IA", external: true },
   { href: "#trust-verification", label: "Confiabilidade", tab: "seguranca" },
   { href: "#download", label: "Baixar App", tab: "download" },
 ];
@@ -115,6 +114,18 @@ export default function Navbar() {
             <ThemeToggle />
           </div>
 
+          {/* Agente IA Button */}
+          <div className="hidden md:block">
+            <button
+              onClick={() => handleNavClick("/agent", true)}
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              aria-label="Abrir Agente Financeiro IA"
+            >
+              <Brain className="w-5 h-5" />
+              Agente IA
+            </button>
+          </div>
+
           {/* CTA Button */}
           <div className="hidden md:block">
             <button
@@ -157,6 +168,14 @@ export default function Navbar() {
                 {link.label}
               </button>
             ))}
+            <button
+              onClick={() => handleNavClick("/agent", true)}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 w-full mt-2"
+              aria-label="Abrir Agente Financeiro IA"
+            >
+              <Brain className="w-5 h-5" />
+              Agente IA
+            </button>
             <button
               onClick={() => handleNavClick("#download")}
               className="lume-btn-primary mt-2 justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
