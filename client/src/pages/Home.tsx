@@ -16,6 +16,7 @@ import { Wallet, Shield, BarChart3, Brain, Download, CheckCircle2 } from "lucide
 
 // Lazy load seções
 const SecuritySection = lazy(() => import("@/components/SecuritySection"));
+const AIChatBox = lazy(() => import("@/components/AIChatBox").then(m => ({ default: m.AIChatBox })));
 const HowItWorksSection = lazy(() => import("@/components/HowItWorksSection"));
 const AccessibilitySection = lazy(() => import("@/components/AccessibilitySection"));
 const LaunchesSection = lazy(() => import("@/components/LaunchesSection"));
@@ -141,6 +142,28 @@ export default function Home() {
         <div className="space-y-8">
           <Suspense fallback={<SectionPlaceholder />}>
             <DownloadSection />
+          </Suspense>
+        </div>
+      ),
+    },
+    {
+      id: "chat",
+      label: "Chat com IA",
+      icon: <Brain className="w-5 h-5" />,
+      content: (
+        <div className="space-y-8">
+          <Suspense fallback={<SectionPlaceholder />}>
+            <div className="bg-slate-800 rounded-lg p-8 shadow-lg border border-slate-700">
+              <AIChatBox
+                messages={[{
+                  role: "assistant",
+                  content: "Olá! 👋 Sou o assistente IA do Lume. Faça suas perguntas sobre gestão financeira, segurança, ou qualquer funcionalidade do app!"
+                }]}
+                onSendMessage={() => {}}
+                height="600px"
+                placeholder="Digite sua pergunta..."
+              />
+            </div>
           </Suspense>
         </div>
       ),
