@@ -33,8 +33,8 @@ export default function FloatingAIChat() {
     setIsLoading(true);
 
     try {
-      // Chamar API de chat via tRPC
-      const response = await fetch("/api/trpc/ai.chat", {
+      // Chamar API de chat via tRPC (chat.sendMessage)
+      const response = await fetch("/api/trpc/chat.sendMessage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,14 +43,14 @@ export default function FloatingAIChat() {
         body: JSON.stringify({
           json: {
             message: content,
-            context: "Você é um assistente financeiro amigável do Lume App. Ajude o usuário com dúvidas sobre gestão financeira, segurança, e funcionalidades do app.",
           },
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        const aiResponse = data.result?.data?.response || "Desculpe, não consegui processar sua mensagem.";
+        // Extrair resposta da estrutura tRPC
+        const aiResponse = data.result?.data?.message || "Desculpe, não consegui processar sua mensagem.";
         setMessages((prev) => [
           ...prev,
           {
@@ -59,6 +59,8 @@ export default function FloatingAIChat() {
           },
         ]);
       } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Erro na resposta:", errorData);
         setMessages((prev) => [
           ...prev,
           {
