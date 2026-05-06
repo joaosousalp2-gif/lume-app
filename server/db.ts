@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, chatMessageFeedback, ChatMessageFeedback, InsertChatMessageFeedback } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -508,4 +508,88 @@ export async function deleteUserIntegration(integrationId: number): Promise<void
   }
 
   await db.delete(userIntegrations).where(eq(userIntegrations.id, integrationId));
+}
+
+
+/**
+ * Save feedback for a chat message
+ */
+export async function saveChatMessageFeedback(
+  userId: number,
+  messageContent: string,
+  messageRole: "user" | "assistant",
+  messageTimestamp: Date,
+  rating: "useful" | "not_useful",
+  comment?: string
+): Promise<ChatMessageFeedback> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const feedback: InsertChatMessageFeedback = {
+    userId,
+    messageContent,
+    messageRole,
+    messageTimestamp,
+    rating,
+    comment: comment || null,
+  };
+
+  const result = await db.insert(chatMessageFeedback).values(feedback);
+  const feedbackId = result[0].insertId;
+
+  return {
+    id: feedbackId as number,
+    ...feedback,
+  } as ChatMessageFeedback;
+}
+
+/**
+ * Get feedback statistics for a user
+ */
+export async function getChatFeedbackStats(userId: number): Promise<{
+  totalFeedback: number;
+  usefulCount: number;
+  notUsefulCount: number;
+  usefulPercentage: number;
+}> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const allFeedback = await db
+    .select()
+    .from(chatMessageFeedback)
+    .where(eq(chatMessageFeedback.userId, userId));
+
+  const usefulCount = allFeedback.filter((f) => f.rating === "useful").length;
+  const notUsefulCount = allFeedback.filter((f) => f.rating === "not_useful").length;
+  const totalFeedback = allFeedback.length;
+  const usefulPercentage = totalFeedback > 0 ? (usefulCount / totalFeedback) * 100 : 0;
+
+  return {
+    totalFeedback,
+    usefulCount,
+    notUsefulCount,
+    usefulPercentage,
+  };
+}
+
+/**
+ * Get recent feedback for a user
+ */
+export async function getRecentChatFeedback(userId: number, limit: number = 20): Promise<ChatMessageFeedback[]> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(chatMessageFeedback)
+    .where(eq(chatMessageFeedback.userId, userId))
+    .orderBy(desc(chatMessageFeedback.createdAt))
+    .limit(limit);
 }

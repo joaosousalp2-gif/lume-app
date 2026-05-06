@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, Send, Trash2, Zap, TrendingDown, HelpCircle } from "lucide-react";
+import { Loader2, Send, Trash2, Zap, TrendingDown, HelpCircle, ThumbsUp, ThumbsDown } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Streamdown } from "streamdown";
@@ -52,12 +52,14 @@ export default function ChatAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Queries e Mutations
   const historyQuery = trpc.chat.getHistory.useQuery(undefined, { enabled: !!user });
   const sendMutation = trpc.chat.sendMessage.useMutation();
   const clearMutation = trpc.chat.clearHistory.useMutation();
+  const feedbackMutation = (trpc as any).chatFeedback.saveFeedback.useMutation();
 
   // Load history on mount
   useEffect(() => {
@@ -123,6 +125,26 @@ export default function ChatAssistant() {
     if (confirm("Tem certeza que deseja limpar o histórico de chat?")) {
       await clearMutation.mutateAsync();
       setMessages([]);
+    }
+  };
+
+  const handleFeedback = async (messageId: number, message: ChatMessage, rating: "useful" | "not_useful") => {
+    if (feedbackSubmitted.has(messageId)) return;
+
+    try {
+      await feedbackMutation.mutateAsync({
+        messageContent: message.content,
+        messageRole: message.role,
+        messageTimestamp: new Date(message.createdAt),
+        rating,
+      });
+      setFeedbackSubmitted((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(messageId);
+        return newSet;
+      });
+    } catch (error) {
+      console.error("Erro ao enviar feedback:", error);
     }
   };
 
@@ -238,6 +260,38 @@ export default function ChatAssistant() {
                       minute: "2-digit",
                     })}
                   </p>
+                  {message.role === "assistant" && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={`h-6 px-2 text-xs ${
+                          feedbackSubmitted.has(message.id)
+                            ? "opacity-50 cursor-default"
+                            : "hover:bg-green-100"
+                        }`}
+                        onClick={() => handleFeedback(message.id, message, "useful")}
+                        disabled={feedbackSubmitted.has(message.id)}
+                      >
+                        <ThumbsUp className="w-3 h-3 mr-1" />
+                        Útil
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={`h-6 px-2 text-xs ${
+                          feedbackSubmitted.has(message.id)
+                            ? "opacity-50 cursor-default"
+                            : "hover:bg-red-100"
+                        }`}
+                        onClick={() => handleFeedback(message.id, message, "not_useful")}
+                        disabled={feedbackSubmitted.has(message.id)}
+                      >
+                        <ThumbsDown className="w-3 h-3 mr-1" />
+                        Não útil
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

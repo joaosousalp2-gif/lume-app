@@ -241,3 +241,25 @@ export const userIntegrations = mysqlTable("userIntegrations", {
 
 export type UserIntegration = typeof userIntegrations.$inferSelect;
 export type InsertUserIntegration = typeof userIntegrations.$inferInsert;
+
+
+/**
+ * Chat message feedback table for tracking user ratings of AI responses
+ */
+export const chatMessageFeedback = mysqlTable("chatMessageFeedback", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  /** Reference to the message content (stored as text in this table) */
+  messageContent: text("messageContent").notNull(),
+  /** Role of the message: user or assistant */
+  messageRole: mysqlEnum("messageRole", ["user", "assistant"]).notNull(),
+  /** Timestamp of the original message */
+  messageTimestamp: timestamp("messageTimestamp").notNull(),
+  rating: mysqlEnum("rating", ["useful", "not_useful"]).notNull(),
+  comment: text("comment"), // Optional user comment explaining the rating
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ChatMessageFeedback = typeof chatMessageFeedback.$inferSelect;
+export type InsertChatMessageFeedback = typeof chatMessageFeedback.$inferInsert;
