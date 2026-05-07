@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, Send, Trash2, Zap, TrendingDown, HelpCircle, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Loader2, Send, Trash2, Zap, TrendingDown, HelpCircle, ThumbsUp, ThumbsDown, Download } from "lucide-react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Streamdown } from "streamdown";
+
 
 interface ChatMessage {
   id: number;
@@ -60,6 +62,8 @@ export default function ChatAssistant() {
   const sendMutation = trpc.chat.sendMessage.useMutation();
   const clearMutation = trpc.chat.clearHistory.useMutation();
   const feedbackMutation = (trpc as any).chatFeedback.saveFeedback.useMutation();
+  const exportMutation = (trpc as any).chatExport.exportPDF.useMutation();
+  const [exporting, setExporting] = useState(false);
 
   // Load history on mount
   useEffect(() => {
@@ -148,6 +152,49 @@ export default function ChatAssistant() {
     }
   };
 
+  const handleExportPDF = async () => {
+    if (messages.length === 0) {
+      toast.error("Nenhuma mensagem para exportar");
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const result = await exportMutation.mutateAsync({
+        includeTimestamps: true,
+        includeStats: true,
+      });
+
+      if (!result.success || !result.data) {
+        toast.error(result.error || "Erro ao exportar chat");
+        return;
+      }
+
+      // Convert base64 to blob and trigger download
+      const binaryString = atob(result.data.base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(`Chat exportado como ${result.data.filename}`);
+    } catch (error) {
+      console.error("Erro ao exportar PDF:", error);
+      toast.error("Erro ao exportar chat para PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const quickActions = [
     {
       label: "Analisar gastos",
@@ -187,16 +234,28 @@ export default function ChatAssistant() {
             <h1 className="text-2xl font-bold text-gray-800">Agente Financeiro IA</h1>
             <p className="text-sm text-gray-600">Seu assistente de finanças pessoais</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClearHistory}
-            className="gap-2"
-            disabled={messages.length === 0}
-          >
-            <Trash2 className="w-4 h-4" />
-            Limpar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportPDF}
+              className="gap-2"
+              disabled={messages.length === 0 || exporting}
+            >
+              <Download className="w-4 h-4" />
+              {exporting ? "Exportando..." : "Exportar PDF"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearHistory}
+              className="gap-2"
+              disabled={messages.length === 0}
+            >
+              <Trash2 className="w-4 h-4" />
+              Limpar
+            </Button>
+          </div>
         </div>
       </div>
 

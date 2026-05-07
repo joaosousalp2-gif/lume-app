@@ -142,3 +142,24 @@
 - [ ] Integrar credenciais do usuário ao envio de SMS/Email
 - [x] Testar fluxo completo com credenciais do usuário (214 testes passando)
 - [ ] Salvar checkpoint final e publicar para produção
+
+## Fase 21: Sistema de Avaliação de Respostas do Agente de IA
+- [x] Criar tabela chatMessageFeedback no banco de dados
+- [x] Implementar endpoints tRPC para salvar feedback (saveFeedback, getStats, getRecent)
+- [x] Adicionar botões "Útil" e "Não Útil" ao ChatAssistant.tsx
+- [x] Implementar lógica de feedback com persistência
+- [x] Registrar chatFeedbackRouter no appRouter
+- [x] Testar sistema de avaliação (214 testes passando)
+- [ ] Criar dashboard de análise de feedback (próximo)
+- [ ] Implementar recomendações baseadas em feedback (próximo)
+
+## Fase 22: Exportação de Chat em PDF
+- [x] Criar módulo chatExport.ts com função exportChatToPDF
+- [x] Corrigir tipos de PDFFont usando embedStandardFont
+- [x] Criar router tRPC chatExportRouter com endpoints exportPDF e getExportStats
+- [x] Registrar chatExportRouter no appRouter
+- [x] Adicionar botão "Exportar PDF" ao ChatAssistant.tsx
+- [x] Implementar lógica de download de PDF no cliente
+- [x] Criar testes unitários para exportação (13 testes passando)
+- [x] Validar fluxo completo de exportação
+- [ ] Salvar checkpoint final

@@ -13,6 +13,7 @@ import { aiAdvancedRouter } from "./routers/aiAdvanced";
 import { auth2FARouter } from "./routers/auth2FA";
 import { integrationsRouter } from "./routers/integrations";
 import { chatFeedbackRouter } from "./routers/chatFeedback";
+import { chatExportRouter } from "./routers/chatExportRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -197,6 +198,7 @@ export const appRouter = router({
 
   chat: chatRouter,
   chatFeedback: chatFeedbackRouter,
+  chatExport: chatExportRouter,
   sync: syncRouter,
   publicData: router(publicDataRouter),
   security: securityRouter,
