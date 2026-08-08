@@ -14,6 +14,7 @@ import { auth2FARouter } from "./routers/auth2FA";
 import { integrationsRouter } from "./routers/integrations";
 import { chatFeedbackRouter } from "./routers/chatFeedback";
 import { chatExportRouter } from "./routers/chatExportRouter";
+import { feedbackRecommendationsRouter } from "./routers/feedbackRecommendationsRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -199,6 +200,7 @@ export const appRouter = router({
   chat: chatRouter,
   chatFeedback: chatFeedbackRouter,
   chatExport: chatExportRouter,
+  feedbackRecommendations: feedbackRecommendationsRouter,
   sync: syncRouter,
   publicData: router(publicDataRouter),
   security: securityRouter,

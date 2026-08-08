@@ -3,12 +3,55 @@
  */
 
 import sgMail from '@sendgrid/mail';
+import { getUserIntegrations } from './db';
+import { decryptData } from './encryption';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'noreply@lume-app.com';
+const userSendgridClients = new Map<number, typeof sgMail>();
 
 if (SENDGRID_API_KEY) {
   sgMail.setApiKey(SENDGRID_API_KEY);
+}
+
+/**
+ * Get SendGrid client from user credentials
+ */
+async function getUserSendGridClient(userId: number) {
+  try {
+    if (userSendgridClients.has(userId)) {
+      return userSendgridClients.get(userId);
+    }
+
+    const integrations = await getUserIntegrations(userId);
+    const integration = integrations.find((i) => i.provider === 'sendgrid');
+    if (!integration) {
+      return null;
+    }
+
+    const decrypted = decryptData(integration.credentials);
+    const credentials = JSON.parse(decrypted);
+
+    if (!credentials.apiKey) {
+      console.warn('[Email] User SendGrid credentials incomplete');
+      return null;
+    }
+
+    const client = sgMail;
+    client.setApiKey(credentials.apiKey);
+    userSendgridClients.set(userId, client);
+    return client;
+  } catch (error) {
+    console.error('[Email] Error getting user SendGrid client:', error);
+    return null;
+  }
+}
+
+/**
+ * Clear user SendGrid client cache
+ */
+export function clearUserSendGridCache(userId: number) {
+  userSendgridClients.delete(userId);
 }
 
 /**
@@ -17,17 +60,33 @@ if (SENDGRID_API_KEY) {
 export async function send2FAEmail(
   toEmail: string,
   code: string,
-  userName?: string
+  userName?: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    if (!SENDGRID_API_KEY) {
+    let fromEmail = SENDGRID_FROM_EMAIL;
+
+    if (userId) {
+      const client = await getUserSendGridClient(userId);
+      if (client) {
+        const integrations = await getUserIntegrations(userId);
+        const integration = integrations.find((i) => i.provider === 'sendgrid');
+        if (integration) {
+          const decrypted = decryptData(integration.credentials);
+          const credentials = JSON.parse(decrypted);
+          fromEmail = credentials.fromEmail || SENDGRID_FROM_EMAIL;
+        }
+      }
+    }
+
+    if (!SENDGRID_API_KEY && !userId) {
       console.warn('[Email] SendGrid not configured');
       return false;
     }
 
     const msg = {
       to: toEmail,
-      from: SENDGRID_FROM_EMAIL,
+      from: fromEmail,
       subject: 'Seu código de verificação Lume',
       html: `
         <h2>Verificação de Segurança</h2>
@@ -54,10 +113,26 @@ export async function send2FAEmail(
 export async function sendBackupCodesEmail(
   toEmail: string,
   codes: string[],
-  userName?: string
+  userName?: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    if (!SENDGRID_API_KEY) {
+    let fromEmail = SENDGRID_FROM_EMAIL;
+
+    if (userId) {
+      const client = await getUserSendGridClient(userId);
+      if (client) {
+        const integrations = await getUserIntegrations(userId);
+        const integration = integrations.find((i) => i.provider === 'sendgrid');
+        if (integration) {
+          const decrypted = decryptData(integration.credentials);
+          const credentials = JSON.parse(decrypted);
+          fromEmail = credentials.fromEmail || SENDGRID_FROM_EMAIL;
+        }
+      }
+    }
+
+    if (!SENDGRID_API_KEY && !userId) {
       console.warn('[Email] SendGrid not configured');
       return false;
     }
@@ -68,7 +143,7 @@ export async function sendBackupCodesEmail(
 
     const msg = {
       to: toEmail,
-      from: SENDGRID_FROM_EMAIL,
+      from: fromEmail,
       subject: 'Seus códigos de backup Lume',
       html: `
         <h2>Códigos de Backup</h2>
@@ -100,10 +175,26 @@ export async function sendTransactionEmail(
   amount: number,
   type: 'receita' | 'despesa',
   category: string,
-  userName?: string
+  userName?: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    if (!SENDGRID_API_KEY) {
+    let fromEmail = SENDGRID_FROM_EMAIL;
+
+    if (userId) {
+      const client = await getUserSendGridClient(userId);
+      if (client) {
+        const integrations = await getUserIntegrations(userId);
+        const integration = integrations.find((i) => i.provider === 'sendgrid');
+        if (integration) {
+          const decrypted = decryptData(integration.credentials);
+          const credentials = JSON.parse(decrypted);
+          fromEmail = credentials.fromEmail || SENDGRID_FROM_EMAIL;
+        }
+      }
+    }
+
+    if (!SENDGRID_API_KEY && !userId) {
       console.warn('[Email] SendGrid not configured');
       return false;
     }
@@ -113,7 +204,7 @@ export async function sendTransactionEmail(
 
     const msg = {
       to: toEmail,
-      from: SENDGRID_FROM_EMAIL,
+      from: fromEmail,
       subject: `Lume: ${typeText} de R$ ${amount.toFixed(2)}`,
       html: `
         <h2>Transação Registrada</h2>
@@ -144,17 +235,33 @@ export async function sendTransactionEmail(
 export async function sendFraudAlertEmail(
   toEmail: string,
   alertMessage: string,
-  userName?: string
+  userName?: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    if (!SENDGRID_API_KEY) {
+    let fromEmail = SENDGRID_FROM_EMAIL;
+
+    if (userId) {
+      const client = await getUserSendGridClient(userId);
+      if (client) {
+        const integrations = await getUserIntegrations(userId);
+        const integration = integrations.find((i) => i.provider === 'sendgrid');
+        if (integration) {
+          const decrypted = decryptData(integration.credentials);
+          const credentials = JSON.parse(decrypted);
+          fromEmail = credentials.fromEmail || SENDGRID_FROM_EMAIL;
+        }
+      }
+    }
+
+    if (!SENDGRID_API_KEY && !userId) {
       console.warn('[Email] SendGrid not configured');
       return false;
     }
 
     const msg = {
       to: toEmail,
-      from: SENDGRID_FROM_EMAIL,
+      from: fromEmail,
       subject: '⚠️ Alerta de Segurança - Lume',
       html: `
         <h2 style="color: #d9534f;">⚠️ Alerta de Segurança</h2>
@@ -188,10 +295,26 @@ export async function sendRecommendationEmail(
   toEmail: string,
   recommendations: string[],
   type: 'economia' | 'investimento' | 'fraude' | 'planejamento',
-  userName?: string
+  userName?: string,
+  userId?: number
 ): Promise<boolean> {
   try {
-    if (!SENDGRID_API_KEY) {
+    let fromEmail = SENDGRID_FROM_EMAIL;
+
+    if (userId) {
+      const client = await getUserSendGridClient(userId);
+      if (client) {
+        const integrations = await getUserIntegrations(userId);
+        const integration = integrations.find((i) => i.provider === 'sendgrid');
+        if (integration) {
+          const decrypted = decryptData(integration.credentials);
+          const credentials = JSON.parse(decrypted);
+          fromEmail = credentials.fromEmail || SENDGRID_FROM_EMAIL;
+        }
+      }
+    }
+
+    if (!SENDGRID_API_KEY && !userId) {
       console.warn('[Email] SendGrid not configured');
       return false;
     }
@@ -209,7 +332,7 @@ export async function sendRecommendationEmail(
 
     const msg = {
       to: toEmail,
-      from: SENDGRID_FROM_EMAIL,
+      from: fromEmail,
       subject: `Lume: Recomendações de ${typeText}`,
       html: `
         <h2>Recomendações Personalizadas</h2>

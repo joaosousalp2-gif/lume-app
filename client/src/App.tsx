@@ -13,6 +13,9 @@ import { TabsProvider } from "./contexts/TabsContext";
 import Home from "./pages/Home";
 import ChatAssistant from "./pages/ChatAssistant";
 import TwoFactorVerification from "./pages/TwoFactorVerification";
+import { lazy, Suspense } from "react";
+
+const FeedbackAnalytics = lazy(() => import("./pages/FeedbackAnalytics"));
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -20,6 +23,13 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/dashboard/chat" component={ChatAssistant} />
+      <Route path="/dashboard/feedback">
+        {() => (
+          <Suspense fallback={<div className="flex items-center justify-center h-screen"><p>Carregando...</p></div>}>
+            <FeedbackAnalytics />
+          </Suspense>
+        )}
+      </Route>
       <Route path="/auth/2fa" component={TwoFactorVerification} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
