@@ -45,3 +45,10 @@ A documentação oficial do BCB consultada confirma que a série SGS 1 é `Taxa 
 ## Voz
 
 Uma chamada real ao endpoint autenticado do Forge para `v1/audio/transcriptions`, usando um WAV válido de 1 segundo, respondeu 200 com o contrato Whisper (`task`, `language`, `duration`, `text`, `segments`). O fornecedor de transcrição está operacional. No código do Lume, porém, a função `processVoiceInput()` precisa transformar o `key` devolvido por `storagePut()` numa URL assinada absoluta antes de chamar `transcribeAudio()`; os testes atuais mascaram esse problema ao devolver uma URL absoluta no mock.
+
+## Fontes externas verificadas em 2026-08-13
+
+- Banco Central: a fonte oficial identifica o código SGS **1178** como “Taxa de juros - Selic anualizada base 252”, em https://dadosabertos.bcb.gov.br/dataset/1178-taxa-de-juros---selic-anualizada-base-252. O código SGS 1 é câmbio, não Selic.
+- Testes HTTP do IBGE: `https://servicodados.ibge.gov.br/api/v3/agregados/1737/periodos/-1/variaveis/63?localidades=BR` respondeu 200; o mesmo agregado para `periodos/202601` respondeu 200; `periodos/2026` respondeu 500. Para PIB, `https://servicodados.ibge.gov.br/api/v3/agregados/1621/periodos/-1/variaveis/584?localidades=BR` respondeu 200, enquanto `periodos/2025` respondeu 500.
+- Testes HTTP do BCB: `https://api.bcb.gov.br/dados/serie/bcdata.sgs.1178/dados/ultimos/1?formato=json`, a série 11 e a série 432 responderam 200 no teste direto. O `getSELIC` do projeto foi corrigido da série 1 para a série 1178.
+- A página oficial do BCB informa que, desde 26/03/2025, consultas históricas JSON/CSV devem respeitar limites e filtros de período. Fonte: https://dadosabertos.bcb.gov.br/dataset/1178-taxa-de-juros---selic-anualizada-base-252.

@@ -263,3 +263,56 @@ export const chatMessageFeedback = mysqlTable("chatMessageFeedback", {
 
 export type ChatMessageFeedback = typeof chatMessageFeedback.$inferSelect;
 export type InsertChatMessageFeedback = typeof chatMessageFeedback.$inferInsert;
+
+/**
+ * Security audit logs and trusted contacts for seniors
+ */
+export const trustedContacts = mysqlTable("trustedContacts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  name: varchar("name", { length: 128 }).notNull(),
+  relationship: varchar("relationship", { length: 64 }).notNull(),
+  phone: varchar("phone", { length: 32 }).notNull(),
+  email: varchar("email", { length: 320 }),
+  notifyFraud: boolean("notifyFraud").default(true).notNull(),
+  notifySuspicious: boolean("notifySuspicious").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type TrustedContact = typeof trustedContacts.$inferSelect;
+export type InsertTrustedContact = typeof trustedContacts.$inferInsert;
+
+/**
+ * Document vault for receipts, invoices, and contracts
+ */
+export const documentVault = mysqlTable("documentVault", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  category: varchar("category", { length: 64 }).notNull(), // 'fatura', 'recibo', 'contrato', 'comprovativo'
+  fileUrl: text("fileUrl").notNull(),
+  storageKey: varchar("storageKey", { length: 255 }).notNull(),
+  extractedData: text("extractedData"), // JSON with OCR / extracted values
+  documentDate: varchar("documentDate", { length: 10 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DocumentVaultItem = typeof documentVault.$inferSelect;
+export type InsertDocumentVaultItem = typeof documentVault.$inferInsert;
+
+/**
+ * User preferences for voice profiles, simplified mode, and notifications
+ */
+export const userPreferences = mysqlTable("userPreferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  simplifiedMode: boolean("simplifiedMode").default(false).notNull(),
+  voiceProfile: varchar("voiceProfile", { length: 32 }).default("pt-BR-natural").notNull(),
+  voiceSpeed: varchar("voiceSpeed", { length: 10 }).default("1.0").notNull(),
+  emailNotifications: boolean("emailNotifications").default(true).notNull(),
+  smsNotifications: boolean("smsNotifications").default(false).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserPreference = typeof userPreferences.$inferSelect;
+export type InsertUserPreference = typeof userPreferences.$inferInsert;

@@ -199,7 +199,7 @@ export async function getSELIC(): Promise<EconomicIndicator | null> {
   try {
     // SELIC - Sistema Especial de Liquidação e de Custódia
     const response = await fetch(
-      "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
+      "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1178/dados/ultimos/1?formato=json"
     );
 
     if (!response.ok) throw new Error(`BCB API error: ${response.status}`);
@@ -214,7 +214,7 @@ export async function getSELIC(): Promise<EconomicIndicator | null> {
 
     const indicator: EconomicIndicator = {
       name: "SELIC",
-      value: parseFloat(latest.valor),
+      value: parseFloat(String(latest.valor).replace(",", ".")),
       unit: "% a.a.",
       date: latest.data,
       source: "BCB",

@@ -1,0 +1,11 @@
+{
+  "name": "Lume - Finanças e Segurança",
+  "short_name": "Lume",
+  "description": "Gestão financeira simples e prevenção de golpes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1d4ed8",
+  "lang": "pt-BR",
+  "icons": []
+}

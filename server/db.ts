@@ -1,6 +1,6 @@
 import { eq, and, desc, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, chatMessageFeedback, ChatMessageFeedback, InsertChatMessageFeedback } from "../drizzle/schema";
+import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, chatMessageFeedback, ChatMessageFeedback, InsertChatMessageFeedback, trustedContacts, userPreferences, documentVault, auditLogs } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -606,4 +606,68 @@ export async function getRecentChatFeedback(userId: number, limit: number = 20):
     .where(eq(chatMessageFeedback.userId, userId))
     .orderBy(desc(chatMessageFeedback.createdAt))
     .limit(limit);
+}
+
+// Trusted contacts and user preferences
+export async function getTrustedContactsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(trustedContacts).where(eq(trustedContacts.userId, userId));
+}
+
+export async function createTrustedContact(contact: typeof trustedContacts.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(trustedContacts).values(contact);
+}
+
+export async function deleteTrustedContact(userId: number, contactId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.delete(trustedContacts).where(and(eq(trustedContacts.userId, userId), eq(trustedContacts.id, contactId)));
+}
+
+export async function getUserPreferences(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const rows = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId)).limit(1);
+  return rows[0];
+}
+
+export async function upsertUserPreferences(userId: number, values: Partial<typeof userPreferences.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const current = await getUserPreferences(userId);
+  if (current) {
+    await db.update(userPreferences).set(values).where(eq(userPreferences.userId, userId));
+    return { ...current, ...values };
+  }
+  await db.insert(userPreferences).values({
+    userId,
+    simplifiedMode: values.simplifiedMode ?? false,
+    voiceProfile: values.voiceProfile ?? "pt-BR-natural",
+    voiceSpeed: values.voiceSpeed ?? "1.0",
+    emailNotifications: values.emailNotifications ?? true,
+    smsNotifications: values.smsNotifications ?? false,
+  });
+  return getUserPreferences(userId);
+}
+
+// Document vault queries
+export async function getDocumentVaultByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(documentVault).where(eq(documentVault.userId, userId));
+}
+
+export async function createDocumentVaultItem(item: typeof documentVault.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(documentVault).values(item);
+}
+
+export async function recordAuditLog(entry: typeof auditLogs.$inferInsert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.insert(auditLogs).values(entry);
 }

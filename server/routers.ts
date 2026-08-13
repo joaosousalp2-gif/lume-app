@@ -12,6 +12,11 @@ import { securityRouter } from "./routers/security";
 import { aiAdvancedRouter } from "./routers/aiAdvanced";
 import { auth2FARouter } from "./routers/auth2FA";
 import { integrationsRouter } from "./routers/integrations";
+import { financialActionsRouter } from "./routers/financialActions";
+import { financialInsightsRouter } from "./routers/financialInsights";
+import { documentVaultRouter } from "./routers/documentVault";
+import { privacyRouter } from "./routers/privacy";
+import { healthRouter } from "./routers/health";
 import { chatFeedbackRouter } from "./routers/chatFeedback";
 import { chatExportRouter } from "./routers/chatExportRouter";
 import { financialReportsRouter } from "./routers/financialReportsRouter";
@@ -210,6 +215,11 @@ export const appRouter = router({
   security: securityRouter,
   aiAdvanced: aiAdvancedRouter,
   integrations: integrationsRouter,
+  financialActions: financialActionsRouter,
+  financialInsights: financialInsightsRouter,
+  documentVault: documentVaultRouter,
+  privacy: privacyRouter,
+  health: healthRouter,
 });
 
 export type AppRouter = typeof appRouter;

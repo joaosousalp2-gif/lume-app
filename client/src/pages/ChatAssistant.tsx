@@ -17,6 +17,11 @@ interface ChatMessage {
   createdAt: Date;
 }
 
+type PendingFinancialAction = {
+  confirmationToken: string;
+  message: string;
+};
+
 interface ResponseQuality {
   hasStructure: boolean;
   hasDiagnosis: boolean;
@@ -64,6 +69,8 @@ export default function ChatAssistant() {
   const feedbackMutation = (trpc as any).chatFeedback.saveFeedback.useMutation();
   const exportMutation = (trpc as any).chatExport.exportPDF.useMutation();
   const voiceMutation = (trpc as any).voice.transcribeVoice.useMutation();
+  const prepareActionMutation = trpc.financialActions.prepare.useMutation();
+  const confirmActionMutation = trpc.financialActions.confirm.useMutation();
   const [exporting, setExporting] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -71,12 +78,19 @@ export default function ChatAssistant() {
   const [playbackRate, setPlaybackRate] = useState<number>(1.0);
   const [continuousListening, setContinuousListening] = useState<boolean>(false);
   const [recognitionInstance, setRecognitionInstance] = useState<any | null>(null);
+  const [pendingFinancialAction, setPendingFinancialAction] = useState<PendingFinancialAction | null>(null);
+  const continuousListeningRef = useRef(false);
+  const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const preferencesQuery = trpc.security.getPreferences.useQuery(undefined, { enabled: !!user });
+  const speechHistoryKey = "lume-speech-history";
 
   useEffect(() => {
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
+      continuousListeningRef.current = false;
+      if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
       if (recognitionInstance) {
         try { recognitionInstance.stop(); } catch {}
       }
@@ -91,6 +105,8 @@ export default function ChatAssistant() {
     }
 
     if (continuousListening) {
+      continuousListeningRef.current = false;
+      if (restartTimerRef.current) clearTimeout(restartTimerRef.current);
       if (recognitionInstance) {
         recognitionInstance.stop();
       }
@@ -101,6 +117,7 @@ export default function ChatAssistant() {
     }
 
     try {
+      continuousListeningRef.current = true;
       const recognition = new SpeechRecognition();
       recognition.lang = "pt-BR";
       recognition.continuous = true;
@@ -122,12 +139,24 @@ export default function ChatAssistant() {
         }
       };
 
-      recognition.onerror = () => {
-        // Ignorar erros menores de silêncio
+      recognition.onerror = (event: any) => {
+        if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+          continuousListeningRef.current = false;
+          setContinuousListening(false);
+          setRecognitionInstance(null);
+          toast.error("O navegador não autorizou a escuta contínua.");
+        }
       };
 
       recognition.onend = () => {
-        // Reinício gerido pelo estado se ativo
+        if (!continuousListeningRef.current) return;
+        restartTimerRef.current = setTimeout(() => {
+          try {
+            recognition.start();
+          } catch {
+            // Alguns navegadores encerram a sessão enquanto reiniciam; a próxima tentativa recupera.
+          }
+        }, 250);
       };
 
       recognition.start();
@@ -161,6 +190,26 @@ export default function ChatAssistant() {
     }
   };
 
+  const exportSpeechHistory = () => {
+    try {
+      const history = JSON.parse(localStorage.getItem(speechHistoryKey) || "[]");
+      if (!Array.isArray(history) || history.length === 0) {
+        toast.info("Ainda não existe histórico de fala para exportar.");
+        return;
+      }
+      const blob = new Blob([JSON.stringify(history, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `lume-historico-de-fala-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("Histórico de fala exportado.");
+    } catch {
+      toast.error("Não foi possível exportar o histórico de fala.");
+    }
+  };
+
   const speakText = (text: string, msgId: number) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
       toast.error("Síntese de voz não suportada neste navegador.");
@@ -181,12 +230,18 @@ export default function ChatAssistant() {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "pt-BR";
-    utterance.rate = playbackRate;
+    utterance.rate = preferencesQuery.data?.voiceSpeed ? Number(preferencesQuery.data.voiceSpeed) : playbackRate;
     utterance.pitch = 0.98; // Tom ligeiramente mais natural e caloroso
 
     // Tentar selecionar voz pt-BR nativa de alta qualidade se disponível
     const voices = window.speechSynthesis.getVoices();
-    const ptVoice = voices.find(v => v.lang === "pt-BR" || v.lang.startsWith("pt")) || voices.find(v => v.lang.startsWith("pt"));
+    const preferredProfile = preferencesQuery.data?.voiceProfile ?? "pt-BR-natural";
+    const profileVoice = preferredProfile.includes("feminina")
+      ? voices.find(v => /female|feminina|luciana|helena/i.test(v.name))
+      : preferredProfile.includes("masculina")
+        ? voices.find(v => /male|masculina|daniel|felipe/i.test(v.name))
+        : undefined;
+    const ptVoice = profileVoice || voices.find(v => v.lang === "pt-BR" || v.lang.startsWith("pt")) || voices.find(v => v.lang.startsWith("pt"));
     if (ptVoice) {
       utterance.voice = ptVoice;
     }
@@ -194,6 +249,14 @@ export default function ChatAssistant() {
     utterance.onend = () => setSpeakingMessageId(null);
     utterance.onerror = () => setSpeakingMessageId(null);
     setSpeakingMessageId(msgId);
+    try {
+      const history = JSON.parse(localStorage.getItem(speechHistoryKey) || "[]");
+      const nextHistory = Array.isArray(history) ? history : [];
+      nextHistory.push({ messageId: msgId, text: cleanText, voiceProfile: preferredProfile, speed: utterance.rate, spokenAt: new Date().toISOString() });
+      localStorage.setItem(speechHistoryKey, JSON.stringify(nextHistory.slice(-100)));
+    } catch {
+      // O histórico é opcional; a reprodução não deve falhar por falta de storage.
+    }
     window.speechSynthesis.speak(utterance);
   };
 
@@ -218,7 +281,7 @@ export default function ChatAssistant() {
 
       recorder.ondataavailable = (e) => chunks.push(e.data);
       recorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
+        const blob = new Blob(chunks, { type: mimeType });
         const reader = new FileReader();
         reader.onloadend = async () => {
           const base64data = (reader.result as string)?.split(",")[1];
@@ -278,6 +341,32 @@ export default function ChatAssistant() {
     setLoading(true);
 
     try {
+      const prepared = await prepareActionMutation.mutateAsync({ message: userMessage });
+      if (prepared.requiresConfirmation && prepared.action) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            userId: user?.id || 0,
+            role: "user",
+            content: userMessage,
+            createdAt: new Date(),
+          },
+          {
+            id: Date.now() + 1,
+            userId: user?.id || 0,
+            role: "assistant",
+            content: prepared.message,
+            createdAt: new Date(),
+          },
+        ]);
+        setPendingFinancialAction({
+          confirmationToken: prepared.action.confirmationToken,
+          message: prepared.message,
+        });
+        return;
+      }
+
       const result = await sendMutation.mutateAsync({ message: userMessage });
 
       // Add user message
@@ -313,6 +402,34 @@ export default function ChatAssistant() {
       }
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmFinancialAction = async (confirmed: boolean) => {
+    if (!pendingFinancialAction) return;
+    setLoading(true);
+    try {
+      const result = await confirmActionMutation.mutateAsync({
+        confirmationToken: pendingFinancialAction.confirmationToken,
+        confirmed,
+      });
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          userId: user?.id || 0,
+          role: "assistant",
+          content: result.message,
+          createdAt: new Date(),
+        },
+      ]);
+      setPendingFinancialAction(null);
+      if (result.success) toast.success("Operação confirmada e guardada.");
+    } catch (error) {
+      console.error("Erro ao confirmar ação financeira:", error);
+      toast.error(error instanceof Error ? error.message : "Não foi possível confirmar a operação.");
     } finally {
       setLoading(false);
     }
@@ -440,6 +557,15 @@ export default function ChatAssistant() {
                 </button>
               ))}
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportSpeechHistory}
+              className="gap-2"
+            >
+              <Volume2 className="w-4 h-4" />
+              Histórico de fala
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -592,6 +718,20 @@ export default function ChatAssistant() {
 
       {/* Input Area */}
       <div className="bg-white border-t border-gray-200 p-4 shadow-lg">
+        {pendingFinancialAction && (
+          <div className="container mx-auto mb-3 rounded-lg border border-amber-300 bg-amber-50 p-4" role="alert" aria-live="polite">
+            <p className="font-semibold text-amber-900">Confirme antes de guardar</p>
+            <p className="mt-1 text-sm text-amber-800">{pendingFinancialAction.message}</p>
+            <div className="mt-3 flex gap-2">
+              <Button type="button" onClick={() => handleConfirmFinancialAction(true)} disabled={loading} className="bg-green-600 text-white hover:bg-green-700">
+                Confirmar
+              </Button>
+              <Button type="button" variant="outline" onClick={() => handleConfirmFinancialAction(false)} disabled={loading}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        )}
         <div className="container mx-auto">
           <div className="flex gap-2">
             <Input

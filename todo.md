@@ -269,3 +269,24 @@
 - [ ] Corrigir integrações avariadas e documentar dependências externas que exigem credenciais ou disponibilidade de terceiros
 - [ ] Criar testes de regressão para cada falha corrigida
 - [ ] Executar check, testes, build e verificação final das URLs do projeto
+
+## Auditoria Geral de Integrações e Correções de Conectividade
+- [x] Inventariar todas as integrações, endpoints e dependências do Lume App
+- [x] Testar conectividade e saúde da base de dados, autenticação e armazenamento S3
+- [x] Auditar APIs públicas (IBGE IPCA/PIB, BCB Selic/CDI/Câmbio e CoinGecko)
+- [x] Corrigir endpoints desatualizados do IBGE para a API v3 com parsers de séries temporais
+- [x] Corrigir cotação de câmbio do BCB para usar série de venda (SGS 1) e compra (SGS 10813)
+- [x] Corrigir fluxo de voz server-side para gerar URLs assinadas absolutas no S3
+- [x] Executar validação completa com 249 testes unitários passando e 0 erros TypeScript
+
+## Implementação Completa da Lista de Funcionalidades
+- [ ] Fase 1: Mapear o estado atual e definir a arquitetura das novas funcionalidades
+- [ ] Fase 2: Criar a base de dados, privacidade e contratos de segurança
+- [ ] Fase 3: Implementar ações financeiras por voz com confirmação inteligente
+- [ ] Fase 4: Implementar centro de segurança, contacto de confiança e alertas de fraude
+- [ ] Fase 5: Implementar inteligência financeira, metas, recorrências, previsões e calendário
+- [ ] Fase 6: Implementar cofre de documentos e leitura assistida de recibos
+- [ ] Fase 7: Implementar prevenção contra golpes, notificações, ajuda e relatórios avançados
+- [ ] Fase 8: Implementar modo simplificado, perfis de voz, histórico de áudio e experiência offline
+- [ ] Fase 9: Preparar integrações bancárias e painel de saúde técnica sem simular conexões
+- [ ] Fase 10: Executar testes, revisão de acessibilidade, build e entrega final

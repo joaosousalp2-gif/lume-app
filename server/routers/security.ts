@@ -12,6 +12,15 @@ import {
   verify2FACode,
   generateBackupCodes,
 } from "../twoFA";
+import {
+  createTrustedContact,
+  deleteTrustedContact,
+  getTrustedContactsByUserId,
+  getUserPreferences,
+  upsertUserPreferences,
+  getLaunchesByUserId,
+} from "../db";
+import { detectSuspiciousTransactions } from "../fraudDetection";
 
 export const securityRouter = router({
   /**
@@ -130,6 +139,50 @@ export const securityRouter = router({
   /**
    * Generate new backup codes
    */
+  getFraudAlerts: protectedProcedure.query(async ({ ctx }) => {
+    const launches = await getLaunchesByUserId(ctx.user.id);
+    return detectSuspiciousTransactions(launches);
+  }),
+
+  getTrustedContacts: protectedProcedure.query(({ ctx }) => getTrustedContactsByUserId(ctx.user.id)),
+
+  addTrustedContact: protectedProcedure
+    .input(z.object({
+      name: z.string().min(1).max(128),
+      relationship: z.string().min(1).max(64),
+      phone: z.string().min(6).max(32),
+      email: z.string().email().optional(),
+      notifyFraud: z.boolean().default(true),
+      notifySuspicious: z.boolean().default(true),
+    }))
+    .mutation(({ ctx, input }) => createTrustedContact({ userId: ctx.user.id, ...input })),
+
+  removeTrustedContact: protectedProcedure
+    .input(z.object({ id: z.number().int().positive() }))
+    .mutation(({ ctx, input }) => deleteTrustedContact(ctx.user.id, input.id).then(() => ({ success: true }))),
+
+  getPreferences: protectedProcedure.query(async ({ ctx }) => {
+    const preferences = await getUserPreferences(ctx.user.id);
+    return preferences ?? {
+      userId: ctx.user.id,
+      simplifiedMode: false,
+      voiceProfile: "pt-BR-natural",
+      voiceSpeed: "1.0",
+      emailNotifications: true,
+      smsNotifications: false,
+    };
+  }),
+
+  updatePreferences: protectedProcedure
+    .input(z.object({
+      simplifiedMode: z.boolean().optional(),
+      voiceProfile: z.string().min(1).max(32).optional(),
+      voiceSpeed: z.string().regex(/^([0-9]+)(\\.[0-9]+)?$/).optional(),
+      emailNotifications: z.boolean().optional(),
+      smsNotifications: z.boolean().optional(),
+    }))
+    .mutation(({ ctx, input }) => upsertUserPreferences(ctx.user.id, input)),
+
   generateBackupCodes: protectedProcedure.mutation(async ({ ctx }) => {
     try {
       const codes = generateBackupCodes(10);

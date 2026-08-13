@@ -6,6 +6,8 @@ import {
 } from "../financialReports";
 import { storagePut } from "../storage";
 import { z } from "zod";
+import { getLaunchesByUserId } from "../db";
+import { buildAnnualFinancialSummary } from "../annualFinancialSummary";
 
 const reportInput = z.object({
   month: z.number().int().min(1).max(12),
@@ -19,6 +21,9 @@ function getPreviousPeriod(month: number, year: number) {
 }
 
 export const financialReportsRouter = router({
+  getAnnualSummary: protectedProcedure
+    .input(z.object({ year: z.number().int().min(2000).max(2100) }))
+    .query(async ({ ctx, input }) => buildAnnualFinancialSummary(await getLaunchesByUserId(ctx.user.id), input.year)),
   getMonthlySummary: protectedProcedure
     .input(reportInput)
     .query(async ({ ctx, input }) => {

@@ -29,8 +29,15 @@ const AIAnalysis = lazy(() => import("@/components/AIAnalysis"));
 const BankAccounts = lazy(() => import("@/components/BankAccounts"));
 const Budget = lazy(() => import("@/components/Budget"));
 const MonthlyReportExport = lazy(() => import("@/components/MonthlyReportExport"));
+const FinancialPlanningPanel = lazy(() => import("@/components/FinancialPlanningPanel"));
+const AnnualSummaryPanel = lazy(() => import("@/components/AnnualSummaryPanel"));
 const TrustVerification = lazy(() => import("@/components/TrustVerification"));
 const TrustIntegration = lazy(() => import("@/components/TrustIntegration"));
+const SecurityCenterSettings = lazy(() => import("@/components/SecurityCenterSettings"));
+const FraudAlertsPanel = lazy(() => import("@/components/FraudAlertsPanel"));
+const DocumentVault = lazy(() => import("@/components/DocumentVault"));
+const ScamPreventionPanel = lazy(() => import("@/components/ScamPreventionPanel"));
+const HealthStatusPanel = lazy(() => import("@/components/HealthStatusPanel"));
 const EconomicIndicators = lazy(() => import("@/components/EconomicIndicators"));
 const DocumentValidator = lazy(() => import("@/components/DocumentValidator"));
 const DownloadSection = lazy(() => import("@/components/DownloadSection"));
@@ -59,6 +66,12 @@ export default function Home() {
         <div className="space-y-8">
           <Suspense fallback={<SectionPlaceholder />}>
             <MonthlyReportExport />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <FinancialPlanningPanel />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <AnnualSummaryPanel />
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <LaunchesSection />
@@ -97,16 +110,31 @@ export default function Home() {
             <SecurityDashboard />
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
+            <SecurityCenterSettings />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
             <FraudProtection />
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
+            <FraudAlertsPanel />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
             <DocumentValidator />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <DocumentVault />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <ScamPreventionPanel />
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <TrustVerification />
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <TrustIntegration />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <HealthStatusPanel />
           </Suspense>
         </div>
       ),
