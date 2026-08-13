@@ -26,6 +26,7 @@ const CentralDashboard = lazy(() => import("@/components/CentralDashboard"));
 const AIAnalysis = lazy(() => import("@/components/AIAnalysis"));
 const BankAccounts = lazy(() => import("@/components/BankAccounts"));
 const Budget = lazy(() => import("@/components/Budget"));
+const MonthlyReportExport = lazy(() => import("@/components/MonthlyReportExport"));
 const TrustVerification = lazy(() => import("@/components/TrustVerification"));
 const TrustIntegration = lazy(() => import("@/components/TrustIntegration"));
 const EconomicIndicators = lazy(() => import("@/components/EconomicIndicators"));
@@ -54,6 +55,9 @@ export default function Home() {
       icon: <Wallet className="w-5 h-5" />,
       content: (
         <div className="space-y-8">
+          <Suspense fallback={<SectionPlaceholder />}>
+            <MonthlyReportExport />
+          </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <LaunchesSection />
           </Suspense>

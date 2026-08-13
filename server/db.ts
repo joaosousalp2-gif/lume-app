@@ -1,4 +1,4 @@
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, launches, users, categorizationRules, CategorizationRule, bankAccounts, budgets, BankAccount, Budget, chatHistory, ChatMessage, financialGoals, FinancialGoal, InsertFinancialGoal, userIntegrations, chatMessageFeedback, ChatMessageFeedback, InsertChatMessageFeedback } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -235,6 +235,20 @@ export async function getTotalBalance(userId: number): Promise<string> {
   }, 0);
 
   return total.toFixed(2);
+}
+
+// ===== Financial Launch Helpers =====
+
+/** Return launches whose ISO date starts with the requested YYYY-MM month. */
+export async function getLaunchesByUserAndMonth(userId: number, month: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(launches)
+    .where(and(eq(launches.userId, userId), like(launches.date, `${month}-%`)))
+    .orderBy(desc(launches.date));
 }
 
 // ===== Budget Helpers =====

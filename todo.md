@@ -163,3 +163,14 @@
 - [x] Criar testes unitários para exportação (13 testes passando)
 - [x] Validar fluxo completo de exportação
 - [x] Salvar checkpoint final
+
+## Fase 24: Exportação de Relatórios Financeiros Mensais em PDF
+- [x] Criar módulo financialReports.ts com geração de PDFs
+- [x] Implementar análise de gastos por categoria
+- [x] Implementar comparação com períodos anteriores
+- [x] Criar router tRPC financialReportsRouter
+- [x] Implementar geração de recomendações personalizadas
+- [x] Criar componente MonthlyReportExport.tsx e integrá-lo à Home
+- [x] Adicionar testes unitários para relatórios com paginação e comparação (7 testes passando)
+- [x] Validar fluxo completo de exportação e compilação sem erros
+- [x] Salvar checkpoint final com funcionalidade completa
