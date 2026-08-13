@@ -9,9 +9,11 @@ import { lazy, Suspense, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
-import Tabs, { TabItem } from "@/components/Tabs";
+import type { TabItem } from "@/components/Tabs";
+import HomeExplorer from "@/components/HomeExplorer";
+import TutorialOverlay from "@/components/TutorialOverlay";
 import { useTabsContext } from "@/contexts/TabsContext";
-import { Wallet, Shield, BarChart3, Brain, Download, CheckCircle2 } from "lucide-react";
+import { Wallet, Shield, Brain, Download, CheckCircle2 } from "lucide-react";
 
 // Lazy load seções
 const SecuritySection = lazy(() => import("@/components/SecuritySection"));
@@ -153,31 +155,14 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950" style={{ fontFamily: "'Nunito', sans-serif" }}>
       <Navbar />
+      <TutorialOverlay />
       <HeroSection />
       <FeaturesSection />
 
-      {/* Main Content with Tabs */}
-      <div className="w-full bg-gradient-to-b from-slate-900 to-slate-950 py-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Explore Lume</h2>
-            <p className="text-gray-400">Escolha uma seção para descobrir todas as funcionalidades</p>
-          </div>
+      <main>
+        <HomeExplorer tabs={mainTabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      </main>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-            <Tabs
-              tabs={mainTabs}
-              defaultTab={activeTab}
-              variant="pills"
-              size="md"
-              onTabChange={setActiveTab}
-              className="w-full"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
       <Suspense fallback={<SectionPlaceholder />}>
         <Footer />
       </Suspense>

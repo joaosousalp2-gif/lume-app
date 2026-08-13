@@ -677,3 +677,89 @@ a:not([class*='btn']) {
     transform: scale(0.98);
   }
 }
+
+@layer components {
+  .lume-tutorial {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 60;
+    width: min(22rem, calc(100vw - 2rem));
+    border: 1px solid rgba(147, 197, 253, 0.35);
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.96);
+    color: white;
+    box-shadow: 0 18px 48px rgba(2, 6, 23, 0.35);
+    backdrop-filter: blur(12px);
+  }
+
+  .lume-tutorial__content {
+    padding: 1.25rem;
+  }
+
+  .lume-tutorial__counter {
+    margin: 0 0 0.25rem;
+    color: #93c5fd;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .lume-tutorial__title {
+    margin: 0;
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 800;
+  }
+
+  .lume-tutorial__text {
+    margin: 0.75rem 0 1rem;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .lume-tutorial__close {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: #cbd5e1;
+    font-size: 1.5rem;
+  }
+
+  .lume-tutorial__close:hover,
+  .lume-tutorial__close:focus-visible {
+    background: rgba(148, 163, 184, 0.16);
+    color: white;
+  }
+
+  .lume-tutorial__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .lume-tutorial__skip {
+    color: #94a3b8;
+    font-size: 0.875rem;
+  }
+
+  .lume-tutorial__skip:hover,
+  .lume-tutorial__skip:focus-visible {
+    color: white;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .lume-tutorial {
+      right: 0.75rem;
+      bottom: 0.75rem;
+      width: calc(100vw - 1.5rem);
+    }
+  }
+}

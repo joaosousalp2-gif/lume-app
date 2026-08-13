@@ -191,3 +191,20 @@
 - [x] Manter lógica de estado e interatividade com JavaScript/TypeScript direto
 - [x] Validar testes, compilação TypeScript e build de produção
 - [x] Salvar checkpoint final da arquitetura organizada
+
+## Fase 27: Seções Reutilizáveis, Testes Visuais e Tutoriais Interativos
+- [x] Extrair secções estáticas da Home para componentes HTML reutilizáveis
+- [x] Adicionar testes visuais automatizados para desktop, tablet e mobile
+- [x] Criar mini-tutoriais interativos em JavaScript puro
+- [x] Integrar tutoriais na Home com estados acessíveis e opção de fechar
+- [x] Validar TypeScript, testes, build e acessibilidade
+- [x] Salvar checkpoint final das três melhorias
+
+- [x] Extrair uma segunda secção estática relevante da Home (Footer) para componente semântico reutilizável
+- [x] Reexecutar check, suíte de testes e testes visuais após essa extração
+
+- [x] Adicionar teste Playwright dedicado de acessibilidade para HomeExplorer, Footer e TutorialOverlay
+- [x] Executar e registrar a validação de acessibilidade junto com os testes finais
+
+- [x] Cobrir no teste de acessibilidade o heading, tablist, tabs e painel ativo do HomeExplorer
+- [x] Reexecutar a validação Playwright após ampliar a cobertura do HomeExplorer
