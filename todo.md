@@ -208,3 +208,24 @@
 
 - [x] Cobrir no teste de acessibilidade o heading, tablist, tabs e painel ativo do HomeExplorer
 - [x] Reexecutar a validação Playwright após ampliar a cobertura do HomeExplorer
+
+## Fase 28: Conversação por Voz no Agente de IA (Áudio em Entrada e Saída)
+- [x] Auditar helpers existentes de transcrição (`transcribeAudio`) e rotas de chat
+- [x] Implementar endpoint tRPC para síntese de voz e rota voiceRouter integrada ao appRouter
+- [x] Criar controlos de microfone (gravação webm + transcrição automática) e reprodução falada (SpeechSynthesis) no ChatAssistant
+- [x] Integrar tratamento de permissões de microfone, feedback visual e testes unitários
+- [x] Validar TypeScript, 246 testes passando e build de produção bem-sucedido
+
+- [x] Inserir e verificar o botão de reprodução falada (Ouvir resposta) nas mensagens do assistente no ChatAssistant.tsx
+- [x] Substituir server/voice.test.ts por testes reais do voiceRouter e processVoiceInput (mocks e tratamento de erro)
+- [x] Refinar o tratamento de permissões e estados de gravação do microfone no ChatAssistant
+- [x] Reexecutar check, testes completos e build após as melhorias de voz
+
+- [x] Criar testes unitários reais para processVoiceInput e erros de transcrição em server/voice.test.ts
+- [x] Adicionar verificação de suporte a MediaRecorder e limpeza de SpeechSynthesis no ChatAssistant.tsx
+- [x] Reexecutar check, testes completos e build para garantir robustez
+
+- [x] Adicionar verificação de typeof MediaRecorder !== "undefined" no startRecording do ChatAssistant.tsx
+- [x] Reexecutar check, testes e build após o ajuste de compatibilidade
+
+- [x] Reexecutar check, testes e build para certificar que a compatibilidade com MediaRecorder passou com sucesso

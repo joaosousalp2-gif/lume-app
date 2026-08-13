@@ -16,6 +16,7 @@ import { chatFeedbackRouter } from "./routers/chatFeedback";
 import { chatExportRouter } from "./routers/chatExportRouter";
 import { financialReportsRouter } from "./routers/financialReportsRouter";
 import { feedbackRecommendationsRouter } from "./routers/feedbackRecommendationsRouter";
+import { voiceRouter } from "./routers/voiceRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -203,6 +204,7 @@ export const appRouter = router({
   chatExport: chatExportRouter,
   financialReports: financialReportsRouter,
   feedbackRecommendations: feedbackRecommendationsRouter,
+  voice: voiceRouter,
   sync: syncRouter,
   publicData: router(publicDataRouter),
   security: securityRouter,

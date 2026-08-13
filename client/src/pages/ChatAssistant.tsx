@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Loader2, Send, Trash2, Zap, TrendingDown, HelpCircle, ThumbsUp, ThumbsDown, Download } from "lucide-react";
+import { Loader2, Send, Trash2, Zap, TrendingDown, HelpCircle, ThumbsUp, ThumbsDown, Download, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -63,7 +63,92 @@ export default function ChatAssistant() {
   const clearMutation = trpc.chat.clearHistory.useMutation();
   const feedbackMutation = (trpc as any).chatFeedback.saveFeedback.useMutation();
   const exportMutation = (trpc as any).chatExport.exportPDF.useMutation();
+  const voiceMutation = (trpc as any).voice.transcribeVoice.useMutation();
   const [exporting, setExporting] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [speakingMessageId, setSpeakingMessageId] = useState<number | null>(null);
+
+  const speakText = (text: string, msgId: number) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      toast.error("Síntese de voz não suportada neste navegador.");
+      return;
+    }
+    if (speakingMessageId === msgId) {
+      window.speechSynthesis.cancel();
+      setSpeakingMessageId(null);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/```[\s\S]*?```/g, "").replace(/#/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "pt-BR";
+    utterance.rate = 1.0;
+    utterance.onend = () => setSpeakingMessageId(null);
+    utterance.onerror = () => setSpeakingMessageId(null);
+    setSpeakingMessageId(msgId);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const startRecording = async () => {
+    if (typeof window === "undefined" || !navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      toast.error("O seu navegador não suporta gravação de áudio.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64data = (reader.result as string)?.split(",")[1];
+          if (!base64data) return;
+          try {
+            setLoading(true);
+            const res = await voiceMutation.mutateAsync({ audioBase64: base64data });
+            if (res && res.text) {
+              setInput(res.text);
+              toast.success("Áudio transcrito com sucesso!");
+            }
+          } catch {
+            toast.error("Erro ao transcrever áudio.");
+          } finally {
+            setLoading(false);
+          }
+        };
+        reader.readAsDataURL(blob);
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      toast.info("A gravar áudio... Fale agora.");
+    } catch {
+      toast.error("Não foi possível aceder ao microfone.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+    }
+  };
 
   // Load history on mount
   useEffect(() => {
@@ -320,7 +405,7 @@ export default function ChatAssistant() {
                     })}
                   </p>
                   {message.role === "assistant" && (
-                    <div className="flex gap-2 mt-2">
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -348,6 +433,24 @@ export default function ChatAssistant() {
                       >
                         <ThumbsDown className="w-3 h-3 mr-1" />
                         Não útil
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 px-2 text-xs gap-1 ml-auto"
+                        onClick={() => speakText(message.content, message.id)}
+                      >
+                        {speakingMessageId === message.id ? (
+                          <>
+                            <VolumeX className="w-3 h-3 text-red-500" />
+                            Parar Áudio
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3 h-3 text-blue-600" />
+                            Ouvir Resposta
+                          </>
+                        )}
                       </Button>
                     </div>
                   )}
@@ -380,13 +483,24 @@ export default function ChatAssistant() {
                   handleSendMessage();
                 }
               }}
-              placeholder="Digite sua pergunta sobre finanças..."
-              disabled={loading}
+              placeholder={isRecording ? "A gravar áudio... Fale agora..." : "Digite sua dúvida ou use o microfone..."}
+              disabled={loading || isRecording}
               className="flex-1 bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
             />
             <Button
+              type="button"
+              variant={isRecording ? "destructive" : "outline"}
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={loading}
+              className={isRecording ? "animate-pulse gap-1" : "gap-1"}
+              title={isRecording ? "Parar gravação" : "Falar por microfone"}
+            >
+              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-blue-600" />}
+              <span className="hidden sm:inline">{isRecording ? "Parar" : "Voz"}</span>
+            </Button>
+            <Button
               onClick={handleSendMessage}
-              disabled={loading || !input.trim()}
+              disabled={loading || (!input.trim() && !isRecording)}
               className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
             >
               {loading ? (
