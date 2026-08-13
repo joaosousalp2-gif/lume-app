@@ -52,3 +52,13 @@ Uma chamada real ao endpoint autenticado do Forge para `v1/audio/transcriptions`
 - Testes HTTP do IBGE: `https://servicodados.ibge.gov.br/api/v3/agregados/1737/periodos/-1/variaveis/63?localidades=BR` respondeu 200; o mesmo agregado para `periodos/202601` respondeu 200; `periodos/2026` respondeu 500. Para PIB, `https://servicodados.ibge.gov.br/api/v3/agregados/1621/periodos/-1/variaveis/584?localidades=BR` respondeu 200, enquanto `periodos/2025` respondeu 500.
 - Testes HTTP do BCB: `https://api.bcb.gov.br/dados/serie/bcdata.sgs.1178/dados/ultimos/1?formato=json`, a série 11 e a série 432 responderam 200 no teste direto. O `getSELIC` do projeto foi corrigido da série 1 para a série 1178.
 - A página oficial do BCB informa que, desde 26/03/2025, consultas históricas JSON/CSV devem respeitar limites e filtros de período. Fonte: https://dadosabertos.bcb.gov.br/dataset/1178-taxa-de-juros---selic-anualizada-base-252.
+
+## Pluggy Open Finance — fontes oficiais consultadas
+
+- Sandbox Pluggy: https://docs.pluggy.ai/docs/sandbox — o ambiente Sandbox pode ser ativado com `sandbox=true` na listagem de conectores; os conectores de teste aparecem com IDs baixos, e as credenciais documentadas para o fluxo básico são `user-ok` e `password-ok`. Os dados são sintéticos e os Items Sandbox inativos por mais de 30 dias podem ser eliminados.
+- Criação de Item: https://docs.pluggy.ai/docs/creating-an-item — o fluxo Open Finance oficial usa Pluggy Connect; conectores Open Finance aparecem a partir do ID 600, e o consentimento pode exigir CPF/CNPJ e redirecionamento para a instituição.
+- Connect Token: https://docs.pluggy.ai/reference/connect-token-create — o backend cria um token temporário com a API key; o frontend utiliza o `accessToken` no Connect Widget. O token pode receber `clientUserId`, `oauthRedirectUri`, `avoidDuplicates` e `itemId` em opções.
+- Ambientes e Connect Widget: https://docs.pluggy.ai/docs/environments-and-configurations — o widget suporta `includeSandbox`, `connectorTypes`, `connectorIds`, `products`, `openFinanceParameters`, callbacks `onSuccess` e `onError`, e deve receber somente Connect Token no browser.
+- Transações: https://docs.pluggy.ai/docs/transactions — transações são recuperadas por conta, em páginas de até 500, com `type` CREDIT/DEBIT e data ISO; o Lume converte-as para receita/despesa e guarda externalId para deduplicação.
+
+A autenticação real do projeto foi validada pelo endpoint `POST https://api.pluggy.ai/auth`, e a listagem real com `sandbox=true` confirmou o conector `Pluggy Bank` (ID 2) e `Sandbox Open Finance` (ID 600).

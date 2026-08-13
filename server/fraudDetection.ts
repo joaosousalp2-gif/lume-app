@@ -3,6 +3,8 @@ export type FraudAlert = {
   severity: "info" | "warning" | "high";
   title: string;
   reason: string;
+  evidence: string;
+  recommendation: string;
   value: number;
   date: string;
 };
@@ -49,6 +51,8 @@ export function detectSuspiciousTransactions(launches: LaunchLike[]): FraudAlert
         severity: "warning",
         title: "Valor fora do padrão",
         reason: `Esta despesa é muito superior à média da categoria ${launch.category}.`,
+        evidence: `Valor de ${amount.toFixed(2)} comparado com uma média de ${average.toFixed(2)} em ${values.length} despesas da categoria.`,
+        recommendation: "Confirme a compra no seu banco e, se não a reconhecer, contacte imediatamente o banco por um canal oficial.",
         value: amount,
         date: launch.date,
       });
@@ -61,6 +65,8 @@ export function detectSuspiciousTransactions(launches: LaunchLike[]): FraudAlert
         severity: "high",
         title: "Possível cobrança repetida",
         reason: "Encontrámos outra despesa igual na mesma categoria e num intervalo de 24 horas.",
+        evidence: `Existem duas despesas de ${amount.toFixed(2)} com a mesma descrição/categoria em menos de 24 horas.`,
+        recommendation: "Não confirme a cobrança como fraude sem verificar. Compare os recibos e peça ao comerciante ou banco a validação da duplicação.",
         value: amount,
         date: launch.date,
       });

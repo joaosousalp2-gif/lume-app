@@ -86,6 +86,14 @@ export default function ChatAssistant() {
   const speechHistoryKey = "lume-speech-history";
 
   useEffect(() => {
+    const prefill = window.localStorage.getItem("lume-agent-prefill");
+    if (prefill) {
+      setInput(prefill);
+      window.localStorage.removeItem("lume-agent-prefill");
+    }
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();

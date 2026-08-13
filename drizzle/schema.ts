@@ -38,6 +38,8 @@ export const launches = mysqlTable("launches", {
   category: varchar("category", { length: 64 }).notNull(),
   value: varchar("value", { length: 20 }).notNull(),
   description: text("description"),
+  source: varchar("source", { length: 32 }).default("manual").notNull(),
+  externalId: varchar("externalId", { length: 128 }),
   recurrence: varchar("recurrence", { length: 20 }).default("Única").notNull(),
   endDate: varchar("endDate", { length: 10 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

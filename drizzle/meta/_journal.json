@@ -120,6 +120,13 @@
       "when": 1786628722176,
       "tag": "0016_simple_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1786662812242,
+      "tag": "0017_gifted_reptil",
+      "breakpoints": true
     }
   ]
 }

@@ -105,6 +105,21 @@ export async function createLaunch(launch: typeof launches.$inferInsert) {
   return result;
 }
 
+export async function findLaunchByExternalId(userId: number, externalId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(launches).where(and(eq(launches.userId, userId), eq(launches.externalId, externalId))).limit(1);
+  return result[0];
+}
+
+export async function createImportedLaunch(launch: typeof launches.$inferInsert) {
+  if (!launch.externalId) throw new Error("Imported launch requires externalId");
+  const existing = await findLaunchByExternalId(launch.userId, launch.externalId);
+  if (existing) return { created: false, launch: existing };
+  await createLaunch({ ...launch, source: launch.source ?? "pluggy" });
+  return { created: true, launch };
+}
+
 export async function updateLaunch(id: number, data: Partial<typeof launches.$inferInsert>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

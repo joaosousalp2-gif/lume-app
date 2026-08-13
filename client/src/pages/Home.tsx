@@ -30,6 +30,7 @@ const BankAccounts = lazy(() => import("@/components/BankAccounts"));
 const Budget = lazy(() => import("@/components/Budget"));
 const MonthlyReportExport = lazy(() => import("@/components/MonthlyReportExport"));
 const FinancialPlanningPanel = lazy(() => import("@/components/FinancialPlanningPanel"));
+const PluggyOpenBankingPanel = lazy(() => import("@/components/PluggyOpenBankingPanel"));
 const AnnualSummaryPanel = lazy(() => import("@/components/AnnualSummaryPanel"));
 const TrustVerification = lazy(() => import("@/components/TrustVerification"));
 const TrustIntegration = lazy(() => import("@/components/TrustIntegration"));
@@ -42,6 +43,7 @@ const EconomicIndicators = lazy(() => import("@/components/EconomicIndicators"))
 const DocumentValidator = lazy(() => import("@/components/DocumentValidator"));
 const DownloadSection = lazy(() => import("@/components/DownloadSection"));
 const Footer = lazy(() => import("@/components/Footer"));
+const FloatingAIAssistant = lazy(() => import("@/components/FloatingAIAssistant"));
 
 function SectionPlaceholder() {
   return (
@@ -69,6 +71,9 @@ export default function Home() {
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <FinancialPlanningPanel />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <PluggyOpenBankingPanel />
           </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <AnnualSummaryPanel />
@@ -184,6 +189,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950" style={{ fontFamily: "'Nunito', sans-serif" }}>
       <Navbar />
       <TutorialOverlay />
+      <Suspense fallback={null}>
+        <FloatingAIAssistant />
+      </Suspense>
       <HeroSection />
       <FeaturesSection />
 

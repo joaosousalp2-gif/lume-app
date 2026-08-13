@@ -296,3 +296,9 @@
 - [x] Aplicar o logotipo oficial no cabeçalho e nos pontos de marca da aplicação
 - [x] Atualizar favicon, manifesto PWA e metadados Open Graph com o logotipo oficial
 - [x] Validar proporções, acessibilidade, build e checkpoint da identidade visual
+
+## Solicitações Adicionais de Melhoria
+- [x] Adicionar histórico de conversas e explicações detalhadas para cada alerta de despesa anómala
+- [x] Configurar Open Finance com o provedor Pluggy para importação bancária real em modo de teste
+- [x] Melhorar o ícone flutuante do Agente IA com comandos de voz diretos e atalhos de ações rápidas
+- [x] Validar com testes automatizados e build de produção

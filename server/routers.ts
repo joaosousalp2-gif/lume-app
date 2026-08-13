@@ -12,6 +12,7 @@ import { securityRouter } from "./routers/security";
 import { aiAdvancedRouter } from "./routers/aiAdvanced";
 import { auth2FARouter } from "./routers/auth2FA";
 import { integrationsRouter } from "./routers/integrations";
+import { pluggyRouter } from "./routers/pluggy";
 import { financialActionsRouter } from "./routers/financialActions";
 import { financialInsightsRouter } from "./routers/financialInsights";
 import { documentVaultRouter } from "./routers/documentVault";
@@ -216,6 +217,7 @@ export const appRouter = router({
   security: securityRouter,
   aiAdvanced: aiAdvancedRouter,
   integrations: integrationsRouter,
+  pluggy: pluggyRouter,
   financialActions: financialActionsRouter,
   financialInsights: financialInsightsRouter,
   documentVault: documentVaultRouter,
