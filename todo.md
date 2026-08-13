@@ -174,3 +174,12 @@
 - [x] Adicionar testes unitários para relatórios com paginação e comparação (7 testes passando)
 - [x] Validar fluxo completo de exportação e compilação sem erros
 - [x] Salvar checkpoint final com funcionalidade completa
+
+## Fase 25: Simplificação e Otimização da Experiência
+- [x] Auditar componentes e identificar ações redundantes na interface
+- [x] Simplificar MonthlyReportExport para uma ação principal e informação progressiva
+- [x] Reduzir renderizações e consultas repetidas no frontend
+- [x] Otimizar geração e transferência dos relatórios PDF com upload no armazenamento e URL de download
+- [x] Reduzir ruído visual e carregamentos desnecessários na Home
+- [x] Validar TypeScript, testes, build e navegação principal com teste dedicado de Navbar
+- [x] Salvar checkpoint final da versão simplificada

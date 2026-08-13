@@ -17,19 +17,11 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { href: "#funcionalidades", label: "Funcionalidades", tab: "financeiro" },
+  { href: "#funcionalidades", label: "Finanças", tab: "financeiro" },
   { href: "#seguranca", label: "Segurança", tab: "seguranca" },
-  { href: "#como-funciona", label: "Como Funciona", tab: "analise" },
-  { href: "#lancamentos", label: "Lancamentos", tab: "financeiro" },
-  { href: "#savings-goals", label: "Metas", tab: "financeiro" },
-  { href: "#central-dashboard", label: "Dashboard", tab: "financeiro" },
-  { href: "#bank-accounts", label: "Contas", tab: "financeiro" },
-  { href: "#planilhas", label: "Planilhas", tab: "financeiro" },
-  { href: "#fraud-protection", label: "Proteção", tab: "seguranca" },
-  { href: "#ai-analysis", label: "IA", tab: "analise" },
+  { href: "#ai-analysis", label: "Análise", tab: "analise" },
   { href: "/dashboard/chat", label: "Agente IA", external: true },
-  { href: "#trust-verification", label: "Confiabilidade", tab: "seguranca" },
-  { href: "#download", label: "Baixar App", tab: "download" },
+  { href: "#download", label: "Baixar", tab: "download" },
 ];
 
 export default function Navbar() {
@@ -115,17 +107,6 @@ export default function Navbar() {
             <ThemeToggle />
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <button
-              onClick={() => handleNavClick("#download")}
-              className="lume-btn-primary text-base px-6 py-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
-              aria-label="Baixar Lume gratuitamente"
-            >
-              Baixar Grátis
-            </button>
-          </div>
-
           {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -157,13 +138,6 @@ export default function Navbar() {
                 {link.label}
               </button>
             ))}
-            <button
-              onClick={() => handleNavClick("#download")}
-              className="lume-btn-primary mt-2 justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded"
-              aria-label="Baixar Lume gratuitamente"
-            >
-              Baixar Grátis
-            </button>
           </div>
         </div>
       )}

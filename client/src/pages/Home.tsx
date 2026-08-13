@@ -5,7 +5,7 @@
  * Público-alvo: pessoas com mais de 60 anos e seus familiares
  */
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
@@ -48,7 +48,7 @@ function SectionPlaceholder() {
 export default function Home() {
   const { activeTab, setActiveTab } = useTabsContext();
 
-  const mainTabs: TabItem[] = [
+  const mainTabs = useMemo<TabItem[]>(() => [
     {
       id: "financeiro",
       label: "Gestão Financeira",
@@ -148,7 +148,7 @@ export default function Home() {
         </div>
       ),
     },
-  ];
+  ], []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950" style={{ fontFamily: "'Nunito', sans-serif" }}>

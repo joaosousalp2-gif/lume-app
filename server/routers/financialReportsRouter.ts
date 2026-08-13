@@ -4,6 +4,7 @@ import {
   generateMonthlyReportPDF,
   getMonthlyAnalysis,
 } from "../financialReports";
+import { storagePut } from "../storage";
 import { z } from "zod";
 
 const reportInput = z.object({
@@ -93,12 +94,18 @@ export const financialReportsRouter = router({
         const recommendations = await generateMonthlyRecommendations(analysis);
         const pdfBuffer = await generateMonthlyReportPDF(analysisWithPrevious, recommendations);
         const monthKey = `${input.year}-${String(input.month).padStart(2, "0")}`;
+        const filename = `lume-relatorio-financeiro-${monthKey}.pdf`;
+        const stored = await storagePut(
+          `users/${ctx.user.id}/financial-reports/${filename}`,
+          pdfBuffer,
+          "application/pdf"
+        );
 
         return {
           success: true,
           data: {
-            base64: pdfBuffer.toString("base64"),
-            filename: `lume-relatorio-financeiro-${monthKey}.pdf`,
+            downloadUrl: stored.url,
+            filename,
             size: pdfBuffer.length,
             month: monthKey,
           },

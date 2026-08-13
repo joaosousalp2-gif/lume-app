@@ -68,6 +68,7 @@ export const Tabs: React.FC<TabsProps> = ({
   };
 
   const variantStyle = variantClasses[variant];
+  const activeTabContent = tabs.find((tab) => tab.id === activeTab)?.content;
 
   return (
     <div className={className}>
@@ -95,19 +96,14 @@ export const Tabs: React.FC<TabsProps> = ({
         ))}
       </div>
 
-      {/* Tab Content */}
-      <div className="mt-4">
-        {tabs.map((tab) => (
-          <div
-            key={tab.id}
-            id={`tabpanel-${tab.id}`}
-            role="tabpanel"
-            aria-labelledby={tab.id}
-            className={`${activeTab === tab.id ? 'block' : 'hidden'} animate-fadeIn`}
-          >
-            {tab.content}
-          </div>
-        ))}
+      {/* Renderiza somente o conteúdo ativo para evitar montar e consultar seções ocultas. */}
+      <div
+        id={`tabpanel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={activeTab}
+        className="mt-4 animate-fadeIn"
+      >
+        {activeTabContent}
       </div>
     </div>
   );

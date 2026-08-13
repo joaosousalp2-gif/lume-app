@@ -10,27 +10,33 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { TabsProvider } from "./contexts/TabsContext";
-import Home from "./pages/Home";
-import ChatAssistant from "./pages/ChatAssistant";
-import TwoFactorVerification from "./pages/TwoFactorVerification";
 import { lazy, Suspense } from "react";
 
+const Home = lazy(() => import("./pages/Home"));
+const ChatAssistant = lazy(() => import("./pages/ChatAssistant"));
+const TwoFactorVerification = lazy(() => import("./pages/TwoFactorVerification"));
 const FeedbackAnalytics = lazy(() => import("./pages/FeedbackAnalytics"));
+
+function RouteFallback() {
+  return <div className="flex min-h-[40vh] items-center justify-center text-slate-400">Carregando...</div>;
+}
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/dashboard/chat" component={ChatAssistant} />
-      <Route path="/dashboard/feedback">
-        {() => (
-          <Suspense fallback={<div className="flex items-center justify-center h-screen"><p>Carregando...</p></div>}>
-            <FeedbackAnalytics />
-          </Suspense>
-        )}
+      <Route path="/">
+        {() => <Suspense fallback={<RouteFallback />}><Home /></Suspense>}
       </Route>
-      <Route path="/auth/2fa" component={TwoFactorVerification} />
+      <Route path="/dashboard/chat">
+        {() => <Suspense fallback={<RouteFallback />}><ChatAssistant /></Suspense>}
+      </Route>
+      <Route path="/dashboard/feedback">
+        {() => <Suspense fallback={<RouteFallback />}><FeedbackAnalytics /></Suspense>}
+      </Route>
+      <Route path="/auth/2fa">
+        {() => <Suspense fallback={<RouteFallback />}><TwoFactorVerification /></Suspense>}
+      </Route>
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

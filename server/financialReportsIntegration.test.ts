@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { financialReportsRouter } from "./routers/financialReportsRouter";
+import { storagePut } from "./storage";
 
 // Mock db functions
+vi.mock("./storage", () => ({
+  storagePut: vi.fn(async () => ({
+    key: "users/1/financial-reports/lume-relatorio-financeiro-2026-08.pdf",
+    url: "/manus-storage/users/1/financial-reports/lume-relatorio-financeiro-2026-08.pdf",
+  })),
+}));
+
 vi.mock("./db", () => ({
   getLaunchesByUserAndMonth: vi.fn(async () => [
     {
@@ -57,8 +65,13 @@ describe("Financial Reports Router Integration", () => {
 
     expect(result.success).toBe(true);
     expect(result.data).toBeDefined();
-    expect(result.data?.base64).toBeTypeOf("string");
+    expect(result.data?.downloadUrl).toBe("/manus-storage/users/1/financial-reports/lume-relatorio-financeiro-2026-08.pdf");
     expect(result.data?.filename).toBe("lume-relatorio-financeiro-2026-08.pdf");
     expect(result.data?.size).toBeGreaterThan(0);
+    expect(storagePut).toHaveBeenCalledWith(
+      "users/1/financial-reports/lume-relatorio-financeiro-2026-08.pdf",
+      expect.any(Buffer),
+      "application/pdf"
+    );
   });
 });
