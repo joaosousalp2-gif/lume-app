@@ -244,3 +244,17 @@
 - [x] Ajustar toggleContinuousListening no ChatAssistant.tsx para exigir estritamente a palavra de ativação "Lume" antes de aceitar comandos
 - [x] Adicionar cleanup de recognitionInstance no useEffect ao desmontar o ChatAssistant
 - [x] Reexecutar check, testes completos e build
+
+## Fase 30: Correção Definitiva do Tom Robótico da IA (Voz Humana e Conversacional)
+- [ ] Atualizar o System Prompt do chat.ts para eliminar seções robóticas e estruturadas em tópicos longos, exigindo conversação natural em português coloquial fluído
+- [ ] Otimizar o speakText em ChatAssistant.tsx para selecionar voz em português do Brasil (pt-BR) natural, ajustar pitch e rate dinâmicos
+- [ ] Remover pontuações excessivas e travessões longos que causam pausas mecânicas na síntese de voz
+- [ ] Criar testes unitários para a nova formatação de fala humanizada
+- [ ] Reexecutar check, testes completos e build de produção para garantir perfeição
+
+## Fase 30: Aperfeiçoamento da Voz e Tom Humano da IA
+- [x] Atualizar System Prompt para impor tom acolhedor, caloroso e humano, eliminando tom robótico e explicações formais
+- [x] Aplicar limpeza rígida de asteriscos, símbolos de formatação e markdown no backend e no frontend antes de enviar para síntese de voz (TTS)
+- [x] Implementar palavra de ativação "Lume" para modo de escuta contínua com feedback sonoro discreto (beeps)
+- [x] Adicionar controle de velocidade de reprodução (1x, 1.25x, 1.5x) para a fala do assistente
+- [x] Validar testes automatizados (249 testes passando, 0 erros TypeScript)

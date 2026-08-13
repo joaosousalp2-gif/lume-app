@@ -182,7 +182,15 @@ export default function ChatAssistant() {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "pt-BR";
     utterance.rate = playbackRate;
-    utterance.pitch = 1.05;
+    utterance.pitch = 0.98; // Tom ligeiramente mais natural e caloroso
+
+    // Tentar selecionar voz pt-BR nativa de alta qualidade se disponível
+    const voices = window.speechSynthesis.getVoices();
+    const ptVoice = voices.find(v => v.lang === "pt-BR" || v.lang.startsWith("pt")) || voices.find(v => v.lang.startsWith("pt"));
+    if (ptVoice) {
+      utterance.voice = ptVoice;
+    }
+
     utterance.onend = () => setSpeakingMessageId(null);
     utterance.onerror = () => setSpeakingMessageId(null);
     setSpeakingMessageId(msgId);
