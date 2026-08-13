@@ -1,6 +1,7 @@
 import { protectedProcedure, router } from "../_core/trpc";
 import { ENV } from "../_core/env";
 import { getDb } from "../db";
+import { trustedContacts } from "../../drizzle/schema";
 import { getExchangeRate, getIPCA, getPIB, getSELIC } from "../publicApis";
 
 async function probe<T>(fn: () => Promise<T | null>) {
@@ -15,13 +16,26 @@ async function probe<T>(fn: () => Promise<T | null>) {
 
 export const healthRouter = router({
   status: protectedProcedure.query(async () => {
-    const [database, ipca, pib, selic, exchange] = await Promise.all([
-      getDb().then((db) => ({ ok: Boolean(db), latencyMs: 0 })).catch(() => ({ ok: false, latencyMs: 0 })),
+    const startedDb = Date.now();
+    let dbOk = false;
+    try {
+      const db = await getDb();
+      if (db) {
+        await db.select().from(trustedContacts).limit(1);
+        dbOk = true;
+      }
+    } catch {
+      dbOk = false;
+    }
+    const database = { ok: dbOk, latencyMs: Date.now() - startedDb };
+
+    const [ipca, pib, selic, exchange] = await Promise.all([
       probe(getIPCA),
       probe(getPIB),
       probe(getSELIC),
       probe(getExchangeRate),
     ]);
+
     return {
       checkedAt: new Date().toISOString(),
       services: {

@@ -17,6 +17,7 @@ import { financialInsightsRouter } from "./routers/financialInsights";
 import { documentVaultRouter } from "./routers/documentVault";
 import { privacyRouter } from "./routers/privacy";
 import { healthRouter } from "./routers/health";
+import { supportRouter } from "./routers/support";
 import { chatFeedbackRouter } from "./routers/chatFeedback";
 import { chatExportRouter } from "./routers/chatExportRouter";
 import { financialReportsRouter } from "./routers/financialReportsRouter";
@@ -220,6 +221,7 @@ export const appRouter = router({
   documentVault: documentVaultRouter,
   privacy: privacyRouter,
   health: healthRouter,
+  support: supportRouter,
 });
 
 export type AppRouter = typeof appRouter;
