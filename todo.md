@@ -183,3 +183,11 @@
 - [x] Reduzir ruído visual e carregamentos desnecessários na Home
 - [x] Validar TypeScript, testes, build e navegação principal com teste dedicado de Navbar
 - [x] Salvar checkpoint final da versão simplificada
+
+## Fase 26: Reorganização para HTML, CSS e JavaScript/TypeScript Direto
+- [x] Mapear componentes estáticos e separar de chamadas tRPC
+- [x] Consolidar estilos globais e classes utilitárias no CSS (`index.css`)
+- [x] Refatorar componentes visuais para HTML semântico limpo
+- [x] Manter lógica de estado e interatividade com JavaScript/TypeScript direto
+- [x] Validar testes, compilação TypeScript e build de produção
+- [x] Salvar checkpoint final da arquitetura organizada

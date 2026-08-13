@@ -626,3 +626,54 @@ a:not([class*='btn']) {
   text-decoration-thickness: 2px;
   text-underline-offset: 4px;
 }
+
+@layer components {
+  .lume-card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .lume-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1.75rem;
+    font-weight: 700;
+    border-radius: var(--radius);
+    background-color: var(--lume-blue);
+    color: white;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  .lume-btn-primary:hover {
+    background-color: #1d4ed8;
+  }
+
+  .lume-btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .lume-btn-green {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1.75rem;
+    font-weight: 700;
+    border-radius: var(--radius);
+    background-color: var(--lume-green);
+    color: white;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  .lume-btn-green:hover {
+    background-color: #16a34a;
+  }
+
+  .lume-btn-green:active {
+    transform: scale(0.98);
+  }
+}
