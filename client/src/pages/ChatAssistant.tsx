@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Streamdown } from "streamdown";
+import { choosePortugueseVoice, cleanSpeechText } from "@/lib/speech";
 
 
 interface ChatMessage {
@@ -221,12 +222,8 @@ export default function ChatAssistant() {
       return;
     }
     window.speechSynthesis.cancel();
-    // Remover asteriscos, markdown, tags e caracteres indesejados para soar 100% humano
-    const cleanText = text
-      .replace(/[*_#`~>-]/g, "")
-      .replace(/https?:\/\/\S+/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+    // Remover marcações e pontuação mecânica antes da síntese.
+    const cleanText = cleanSpeechText(text);
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "pt-BR";
@@ -236,12 +233,7 @@ export default function ChatAssistant() {
     // Tentar selecionar voz pt-BR nativa de alta qualidade se disponível
     const voices = window.speechSynthesis.getVoices();
     const preferredProfile = preferencesQuery.data?.voiceProfile ?? "pt-BR-natural";
-    const profileVoice = preferredProfile.includes("feminina")
-      ? voices.find(v => /female|feminina|luciana|helena/i.test(v.name))
-      : preferredProfile.includes("masculina")
-        ? voices.find(v => /male|masculina|daniel|felipe/i.test(v.name))
-        : undefined;
-    const ptVoice = profileVoice || voices.find(v => v.lang === "pt-BR" || v.lang.startsWith("pt")) || voices.find(v => v.lang.startsWith("pt"));
+    const ptVoice = choosePortugueseVoice(voices, preferredProfile);
     if (ptVoice) {
       utterance.voice = ptVoice;
     }

@@ -246,11 +246,11 @@
 - [x] Reexecutar check, testes completos e build
 
 ## Fase 30: Correção Definitiva do Tom Robótico da IA (Voz Humana e Conversacional)
-- [ ] Atualizar o System Prompt do chat.ts para eliminar seções robóticas e estruturadas em tópicos longos, exigindo conversação natural em português coloquial fluído
-- [ ] Otimizar o speakText em ChatAssistant.tsx para selecionar voz em português do Brasil (pt-BR) natural, ajustar pitch e rate dinâmicos
-- [ ] Remover pontuações excessivas e travessões longos que causam pausas mecânicas na síntese de voz
-- [ ] Criar testes unitários para a nova formatação de fala humanizada
-- [ ] Reexecutar check, testes completos e build de produção para garantir perfeição
+- [x] Atualizar o System Prompt do chat.ts para eliminar seções robóticas e estruturadas em tópicos longos, exigindo conversação natural em português coloquial fluído
+- [x] Otimizar o speakText em ChatAssistant.tsx para selecionar voz em português do Brasil (pt-BR) natural, ajustar pitch e rate dinâmicos
+- [x] Remover pontuações excessivas e travessões longos que causam pausas mecânicas na síntese de voz
+- [x] Criar testes unitários para a nova formatação de fala humanizada
+- [x] Reexecutar check, testes completos e build de produção para garantir perfeição
 
 ## Fase 30: Aperfeiçoamento da Voz e Tom Humano da IA
 - [x] Atualizar System Prompt para impor tom acolhedor, caloroso e humano, eliminando tom robótico e explicações formais
@@ -260,15 +260,15 @@
 - [x] Validar testes automatizados (249 testes passando, 0 erros TypeScript)
 
 ## Auditoria Geral de Integrações
-- [ ] Inventariar APIs, conectores, URLs, variáveis de ambiente e serviços internos usados pelo projeto
-- [ ] Validar ligação à base de dados, esquema, consultas essenciais e migrações
-- [ ] Validar autenticação OAuth, sessão, rotas protegidas e endpoints tRPC
-- [ ] Validar armazenamento de ficheiros, upload/download e geração de relatórios
-- [ ] Testar APIs públicas de Banco Central, IBGE, CoinGecko e demais endpoints configurados
-- [ ] Testar LLM, transcrição Whisper, síntese de voz e reconhecimento de voz no navegador
-- [ ] Corrigir integrações avariadas e documentar dependências externas que exigem credenciais ou disponibilidade de terceiros
-- [ ] Criar testes de regressão para cada falha corrigida
-- [ ] Executar check, testes, build e verificação final das URLs do projeto
+- [x] Inventariar APIs, conectores, URLs, variáveis de ambiente e serviços internos usados pelo projeto
+- [x] Validar ligação à base de dados, esquema, consultas essenciais e migrações
+- [x] Validar autenticação OAuth, sessão, rotas protegidas e endpoints tRPC
+- [x] Validar armazenamento de ficheiros, upload/download e geração de relatórios
+- [x] Testar APIs públicas de Banco Central, IBGE, CoinGecko e demais endpoints configurados
+- [x] Testar LLM, transcrição Whisper, síntese de voz e reconhecimento de voz no navegador
+- [x] Corrigir integrações avariadas e documentar dependências externas que exigem credenciais ou disponibilidade de terceiros
+- [x] Criar testes de regressão para cada falha corrigida
+- [x] Executar check, testes, build e verificação final das URLs do projeto
 
 ## Auditoria Geral de Integrações e Correções de Conectividade
 - [x] Inventariar todas as integrações, endpoints e dependências do Lume App
@@ -280,16 +280,16 @@
 - [x] Executar validação completa com 249 testes unitários passando e 0 erros TypeScript
 
 ## Implementação Completa da Lista de Funcionalidades
-- [ ] Fase 1: Mapear o estado atual e definir a arquitetura das novas funcionalidades
-- [ ] Fase 2: Criar a base de dados, privacidade e contratos de segurança
-- [ ] Fase 3: Implementar ações financeiras por voz com confirmação inteligente
-- [ ] Fase 4: Implementar centro de segurança, contacto de confiança e alertas de fraude
-- [ ] Fase 5: Implementar inteligência financeira, metas, recorrências, previsões e calendário
-- [ ] Fase 6: Implementar cofre de documentos e leitura assistida de recibos
-- [ ] Fase 7: Implementar prevenção contra golpes, notificações, ajuda e relatórios avançados
-- [ ] Fase 8: Implementar modo simplificado, perfis de voz, histórico de áudio e experiência offline
-- [ ] Fase 9: Preparar integrações bancárias e painel de saúde técnica sem simular conexões
-- [ ] Fase 10: Executar testes, revisão de acessibilidade, build e entrega final
+- [x] Fase 1: Mapear o estado atual e definir a arquitetura das novas funcionalidades
+- [x] Fase 2: Criar a base de dados, privacidade e contratos de segurança
+- [x] Fase 3: Implementar ações financeiras por voz com confirmação inteligente
+- [x] Fase 4: Implementar centro de segurança, contacto de confiança e alertas de fraude
+- [x] Fase 5: Implementar inteligência financeira, metas, recorrências, previsões e calendário
+- [x] Fase 6: Implementar cofre de documentos e leitura assistida de recibos
+- [x] Fase 7: Implementar prevenção contra golpes, notificações, ajuda e relatórios avançados
+- [x] Fase 8: Implementar modo simplificado, perfis de voz, histórico de áudio e experiência offline
+- [x] Fase 9: Preparar integrações bancárias e painel de saúde técnica sem simular conexões
+- [x] Fase 10: Executar testes, revisão de acessibilidade, build e entrega final
 
 ## Identidade Visual Oficial da Lume
 - [x] Armazenar o logotipo oficial fornecido em armazenamento persistente do projeto
