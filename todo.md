@@ -290,3 +290,9 @@
 - [ ] Fase 8: Implementar modo simplificado, perfis de voz, histórico de áudio e experiência offline
 - [ ] Fase 9: Preparar integrações bancárias e painel de saúde técnica sem simular conexões
 - [ ] Fase 10: Executar testes, revisão de acessibilidade, build e entrega final
+
+## Identidade Visual Oficial da Lume
+- [x] Armazenar o logotipo oficial fornecido em armazenamento persistente do projeto
+- [x] Aplicar o logotipo oficial no cabeçalho e nos pontos de marca da aplicação
+- [x] Atualizar favicon, manifesto PWA e metadados Open Graph com o logotipo oficial
+- [x] Validar proporções, acessibilidade, build e checkpoint da identidade visual

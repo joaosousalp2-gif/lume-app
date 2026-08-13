@@ -4,8 +4,15 @@
   "description": "Gestão financeira simples e prevenção de golpes.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#ffffff",
   "theme_color": "#1d4ed8",
   "lang": "pt-BR",
-  "icons": []
+  "icons": [
+    {
+      "src": "/manus-storage/lume-logo-official_0b7827ba.png",
+      "sizes": "614x503",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }

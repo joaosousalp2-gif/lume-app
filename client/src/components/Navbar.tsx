@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from "react";
-import { Lightbulb, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useTabsContext } from "@/contexts/TabsContext";
 import ThemeToggle from "./ThemeToggle";
 
@@ -73,15 +73,11 @@ export default function Navbar() {
             onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
             aria-label="Lume - Voltar ao topo"
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center lume-gradient-blue logo-glow">
-              <Lightbulb className="w-6 h-6 text-yellow-300" fill="currentColor" aria-hidden="true" />
-            </div>
-            <span
-              className="text-2xl font-bold"
-              style={{ fontFamily: "'Poppins', sans-serif", color: scrolled ? "#2563EB" : "#fff" }}
-            >
-              Lume
-            </span>
+            <img
+              src="/manus-storage/lume-logo-official_0b7827ba.png"
+              alt="Lume — Finanças e Segurança para Você"
+              className={`h-12 w-auto max-w-[150px] object-contain transition-[filter] duration-300 ${scrolled ? "drop-shadow-sm" : "brightness-0 invert"}`}
+            />
           </a>
 
           {/* Desktop Nav */}

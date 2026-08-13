@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useRef } from "react";
-import { Download, CheckCircle, Smartphone, Lightbulb } from "lucide-react";
+import { Download, CheckCircle, Smartphone } from "lucide-react";
 
 const benefits = [
   "Gratuito para baixar e usar",
@@ -121,9 +121,11 @@ export default function DownloadSection() {
             >
               {/* Logo */}
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-14 h-14 rounded-2xl lume-gradient-blue flex items-center justify-center logo-glow">
-                  <Lightbulb className="w-8 h-8 text-yellow-300" fill="currentColor" />
-                </div>
+                <img
+                  src="/manus-storage/lume-logo-official_0b7827ba.png"
+                  alt="Logotipo oficial da Lume"
+                  className="h-14 w-auto max-w-[170px] object-contain"
+                />
                 <div>
                   <h3 className="text-2xl font-black text-white" style={{ fontFamily: "'Poppins', sans-serif" }}>
                     Lume

@@ -1,4 +1,4 @@
-import { Heart, Lightbulb, Mail, MapPin, Phone, Shield } from "lucide-react";
+import { Heart, Mail, MapPin, Phone, Shield } from "lucide-react";
 
 const footerLinks = {
   produto: [
@@ -50,10 +50,11 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <section aria-labelledby="footer-brand-title">
             <div className="mb-4 flex items-center gap-2">
-              <div className="logo-glow lume-gradient-blue flex h-10 w-10 items-center justify-center rounded-xl">
-                <Lightbulb className="h-6 w-6 text-yellow-300" fill="currentColor" aria-hidden="true" />
-              </div>
-              <h2 id="footer-brand-title" className="text-2xl font-black text-white font-heading">Lume</h2>
+              <img
+                src="/manus-storage/lume-logo-official_0b7827ba.png"
+                alt="Lume — Finanças e Segurança para Você"
+                className="h-12 w-auto max-w-[150px] object-contain brightness-0 invert"
+              />
             </div>
             <p className="mb-6 text-base leading-relaxed text-gray-200">
               Iluminando a vida financeira de pessoas com mais de 60 anos. Simples, seguro e feito com carinho.
