@@ -68,6 +68,98 @@ export default function ChatAssistant() {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [speakingMessageId, setSpeakingMessageId] = useState<number | null>(null);
+  const [playbackRate, setPlaybackRate] = useState<number>(1.0);
+  const [continuousListening, setContinuousListening] = useState<boolean>(false);
+  const [recognitionInstance, setRecognitionInstance] = useState<any | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      if (recognitionInstance) {
+        try { recognitionInstance.stop(); } catch {}
+      }
+    };
+  }, [recognitionInstance]);
+
+  const toggleContinuousListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("O seu navegador não suporta reconhecimento de fala contínuo.");
+      return;
+    }
+
+    if (continuousListening) {
+      if (recognitionInstance) {
+        recognitionInstance.stop();
+      }
+      setRecognitionInstance(null);
+      setContinuousListening(false);
+      toast.info("Modo de escuta contínua desativado.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "pt-BR";
+      recognition.continuous = true;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        // Exigir estritamente a palavra de ativação "lume"
+        if (transcript.includes("lume")) {
+          playBeep();
+          const parts = transcript.split("lume");
+          const cleanCommand = (parts[1] || parts[0] || "").trim();
+          if (cleanCommand) {
+            setInput(cleanCommand);
+            toast.success(`Comando detetado via Lume: "${cleanCommand}"`);
+          } else {
+            toast.info("Diga o seu comando após 'Lume'.");
+          }
+        }
+      };
+
+      recognition.onerror = () => {
+        // Ignorar erros menores de silêncio
+      };
+
+      recognition.onend = () => {
+        // Reinício gerido pelo estado se ativo
+      };
+
+      recognition.start();
+      setRecognitionInstance(recognition);
+      setContinuousListening(true);
+      playBeep();
+      toast.success("Escuta ativada! Diga 'Lume' seguido da sua pergunta.");
+    } catch {
+      toast.error("Erro ao iniciar escuta contínua.");
+    }
+  };
+
+  const playBeep = () => {
+    try {
+      if (typeof window === "undefined") return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } catch {
+      // AudioContext policy restriction fallback
+    }
+  };
 
   const speakText = (text: string, msgId: number) => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
@@ -80,10 +172,17 @@ export default function ChatAssistant() {
       return;
     }
     window.speechSynthesis.cancel();
-    const cleanText = text.replace(/```[\s\S]*?```/g, "").replace(/#/g, "");
+    // Remover asteriscos, markdown, tags e caracteres indesejados para soar 100% humano
+    const cleanText = text
+      .replace(/[*_#`~>-]/g, "")
+      .replace(/https?:\/\/\S+/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "pt-BR";
-    utterance.rate = 1.0;
+    utterance.rate = playbackRate;
+    utterance.pitch = 1.05;
     utterance.onend = () => setSpeakingMessageId(null);
     utterance.onerror = () => setSpeakingMessageId(null);
     setSpeakingMessageId(msgId);
@@ -136,6 +235,7 @@ export default function ChatAssistant() {
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
+      playBeep();
       toast.info("A gravar áudio... Fale agora.");
     } catch {
       toast.error("Não foi possível aceder ao microfone.");
@@ -319,7 +419,19 @@ export default function ChatAssistant() {
             <h1 className="text-2xl font-bold text-gray-800">Agente Financeiro IA</h1>
             <p className="text-sm text-gray-600">Seu assistente de finanças pessoais</p>
           </div>
-          <div className="flex gap-2">
+            <div className="flex gap-2 items-center flex-wrap">
+            <div className="flex items-center gap-1 bg-gray-100 rounded-md px-2 py-1 text-xs">
+              <span className="text-gray-600 font-medium">Velocidade:</span>
+              {[1.0, 1.25, 1.5].map((rate) => (
+                <button
+                  key={rate}
+                  onClick={() => setPlaybackRate(rate)}
+                  className={`px-1.5 py-0.5 rounded ${playbackRate === rate ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-200"}`}
+                >
+                  {rate}x
+                </button>
+              ))}
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -497,6 +609,16 @@ export default function ChatAssistant() {
             >
               {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-blue-600" />}
               <span className="hidden sm:inline">{isRecording ? "Parar" : "Voz"}</span>
+            </Button>
+            <Button
+              type="button"
+              variant={continuousListening ? "default" : "outline"}
+              onClick={toggleContinuousListening}
+              className={continuousListening ? "bg-green-600 hover:bg-green-700 text-white gap-1 animate-pulse" : "gap-1"}
+              title="Escuta contínua com palavra 'Lume'"
+            >
+              <Mic className="w-4 h-4" />
+              <span className="hidden sm:inline">{continuousListening ? "A escutar" : "Lume"}</span>
             </Button>
             <Button
               onClick={handleSendMessage}

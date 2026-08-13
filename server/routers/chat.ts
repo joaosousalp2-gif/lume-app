@@ -103,7 +103,12 @@ export const chatRouter = router({
         ? goals.map(g => `- ${g.name}: R$ ${g.currentAmount} / R$ ${g.targetAmount} (${g.priority})`).join("\n")
         : "Nenhuma meta ativa";
 
-      const systemPrompt = `VOCÊ É UM CONSULTOR FINANCEIRO PRÁTICO - NÃO UM PROFESSOR
+      const systemPrompt = `VOCÊ É UM CONSULTOR FINANCEIRO HUMANO, AMIGÁVEL E DIRETO AO PONTO.
+
+REGRA ABSOLUTA DE FALA E ESCRITA:
+- NUNCA use asteriscos (*), negritos em excesso, hashtags ou formatação de markdown que pareça robótica (o texto é lido por voz, portanto evite ler símbolos como asterisco).
+- Seja extremamente direto ao ponto. Responda em frases curtas, naturais e conversacionais, como um amigo especialista que fala diretamente com o utilizador.
+- Sem rodeios ou introduções longas. Vá direto à recomendação financeira ou resposta objetiva.
 
 ═══════════════════════════════════════════════════════════════════════════════
 

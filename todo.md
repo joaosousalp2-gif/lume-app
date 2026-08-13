@@ -229,3 +229,18 @@
 - [x] Reexecutar check, testes e build após o ajuste de compatibilidade
 
 - [x] Reexecutar check, testes e build para certificar que a compatibilidade com MediaRecorder passou com sucesso
+
+## Fase 29: Voz Mais Humana, Controlo de Velocidade, Escuta Contínua e Respostas Diretas
+- [x] Atualizar o System Prompt do chat.ts para eliminar asteriscos, tom robótico e exigir respostas diretas e naturais
+- [x] Refinar a limpeza de texto falado (`cleanText`) para remover asteriscos, markdown, negritos e símbolos antes do SpeechSynthesis
+- [x] Adicionar seletor de velocidade de reprodução (1x, 1.25x, 1.5x) e feedback sonoro discreto (Web Audio API beep)
+- [x] Implementar suporte a conversação fluida por voz e palavra de ativação com controlos acessíveis
+- [x] Validar TypeScript, 248 testes passando, build de produção bem-sucedido e salvar checkpoint final
+
+- [x] Implementar escuta contínua com Web Speech API (SpeechRecognition) e detecção da palavra de ativação "Lume" no ChatAssistant.tsx
+- [x] Criar testes unitários para limpeza rigorosa de texto falado e comandos de voz
+- [x] Reexecutar check, testes completos e build para garantir qualidade de produção
+
+- [x] Ajustar toggleContinuousListening no ChatAssistant.tsx para exigir estritamente a palavra de ativação "Lume" antes de aceitar comandos
+- [x] Adicionar cleanup de recognitionInstance no useEffect ao desmontar o ChatAssistant
+- [x] Reexecutar check, testes completos e build
