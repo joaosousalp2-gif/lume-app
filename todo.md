@@ -258,3 +258,14 @@
 - [x] Implementar palavra de ativação "Lume" para modo de escuta contínua com feedback sonoro discreto (beeps)
 - [x] Adicionar controle de velocidade de reprodução (1x, 1.25x, 1.5x) para a fala do assistente
 - [x] Validar testes automatizados (249 testes passando, 0 erros TypeScript)
+
+## Auditoria Geral de Integrações
+- [ ] Inventariar APIs, conectores, URLs, variáveis de ambiente e serviços internos usados pelo projeto
+- [ ] Validar ligação à base de dados, esquema, consultas essenciais e migrações
+- [ ] Validar autenticação OAuth, sessão, rotas protegidas e endpoints tRPC
+- [ ] Validar armazenamento de ficheiros, upload/download e geração de relatórios
+- [ ] Testar APIs públicas de Banco Central, IBGE, CoinGecko e demais endpoints configurados
+- [ ] Testar LLM, transcrição Whisper, síntese de voz e reconhecimento de voz no navegador
+- [ ] Corrigir integrações avariadas e documentar dependências externas que exigem credenciais ou disponibilidade de terceiros
+- [ ] Criar testes de regressão para cada falha corrigida
+- [ ] Executar check, testes, build e verificação final das URLs do projeto

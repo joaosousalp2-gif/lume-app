@@ -17,6 +17,7 @@ vi.mock("./storage", () => ({
     key,
     url: `https://storage.example.com/${key}`,
   })),
+  storageGetSignedUrl: vi.fn(async (key) => `https://storage.example.com/signed/${key}`),
 }));
 
 describe("Voice processing router and robust helper tests", () => {

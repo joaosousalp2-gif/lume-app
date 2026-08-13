@@ -73,10 +73,9 @@ export async function getIPCA(): Promise<EconomicIndicator | null> {
   if (cached) return cached;
 
   try {
-    // IPCA - Índice Nacional de Preços ao Consumidor Amplo
-    // Tabela 1737 - IPCA mensal
+    // IPCA - Variação mensal (Variável 63 da Tabela 1737)
     const response = await fetch(
-      "https://servicodados.ibge.gov.br/api/v3/agregados/1737/periodos/-1/variavel/2063?formato=json"
+      "https://servicodados.ibge.gov.br/api/v3/agregados/1737/periodos/-1/variaveis/63?localidades=BR&formato=json"
     );
 
     if (!response.ok) throw new Error(`IBGE API error: ${response.status}`);
@@ -88,20 +87,25 @@ export async function getIPCA(): Promise<EconomicIndicator | null> {
     }
 
     const resultado = data[0].resultados[0];
-    const series = resultado.series[0];
+    const seriesObj = resultado.series?.[0];
 
-    if (!series || !series.dados || series.dados.length === 0) {
+    if (!seriesObj || !seriesObj.serie) {
       return null;
     }
 
-    const latestData = series.dados[0];
-    const [value, date] = latestData;
+    const entries = Object.entries(seriesObj.serie);
+    if (entries.length === 0) {
+      return null;
+    }
+
+    const [dateKey, valStr] = entries[entries.length - 1];
+    const value = parseFloat(valStr as string);
 
     const indicator: EconomicIndicator = {
       name: "IPCA",
-      value: parseFloat(value),
+      value: isNaN(value) ? 0 : value,
       unit: "%",
-      date: date,
+      date: dateKey,
       source: "IBGE",
     };
 
@@ -122,10 +126,9 @@ export async function getPIB(): Promise<EconomicIndicator | null> {
   if (cached) return cached;
 
   try {
-    // PIB - Produto Interno Bruto
-    // Tabela 1621 - PIB trimestral
+    // PIB - Tabela 1621, Variável 584 (Série encadeada do índice de volume trimestral)
     const response = await fetch(
-      "https://servicodados.ibge.gov.br/api/v3/agregados/1621/periodos/-1/variavel/9318?formato=json"
+      "https://servicodados.ibge.gov.br/api/v3/agregados/1621/periodos/-1/variaveis/584?localidades=BR&formato=json"
     );
 
     if (!response.ok) throw new Error(`IBGE API error: ${response.status}`);
@@ -137,20 +140,38 @@ export async function getPIB(): Promise<EconomicIndicator | null> {
     }
 
     const resultado = data[0].resultados[0];
-    const series = resultado.series[0];
+    const seriesObj = resultado.series?.[0];
 
-    if (!series || !series.dados || series.dados.length === 0) {
+    if (!seriesObj || !seriesObj.serie) {
       return null;
     }
 
-    const latestData = series.dados[0];
-    const [value, date] = latestData;
+    const entries = Object.entries(seriesObj.serie);
+    if (entries.length === 0) {
+      return null;
+    }
+
+    // Ignorar valores nulos ".." se existirem no último período
+    let validEntry: [string, any] | undefined = undefined;
+    for (let i = entries.length - 1; i >= 0; i--) {
+      if (entries[i][1] !== ".." && entries[i][1] != null) {
+        validEntry = entries[i];
+        break;
+      }
+    }
+
+    if (!validEntry) {
+      validEntry = entries[entries.length - 1];
+    }
+
+    const [dateKey, valStr] = validEntry;
+    const value = parseFloat(valStr as string);
 
     const indicator: EconomicIndicator = {
-      name: "PIB",
-      value: parseFloat(value),
-      unit: "bilhões R$",
-      date: date,
+      name: "PIB (Índice)",
+      value: isNaN(value) ? 0 : value,
+      unit: "número-índice",
+      date: dateKey,
       source: "IBGE",
     };
 
@@ -256,29 +277,40 @@ export async function getExchangeRate(): Promise<ExchangeRate | null> {
   if (cached) return cached;
 
   try {
-    // Dólar comercial - venda
-    const response = await fetch(
-      "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
-    );
+    const [respSell, respBuy] = await Promise.all([
+      fetch("https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"),
+      fetch("https://api.bcb.gov.br/dados/serie/bcdata.sgs.10813/dados/ultimos/1?formato=json"),
+    ]);
 
-    if (!response.ok) throw new Error(`BCB API error: ${response.status}`);
+    if (!respSell.ok) throw new Error(`BCB API error: ${respSell.status}`);
 
-    const data = (await response.json()) as any;
-
-    if (!Array.isArray(data) || data.length === 0) {
+    const dataSell = (await respSell.json()) as any;
+    if (!Array.isArray(dataSell) || dataSell.length === 0) {
       return null;
     }
 
-    const latest = data[0];
+    const latestSell = dataSell[0];
+    const sellRate = parseFloat(latestSell.valor);
+    let buyRate = sellRate * 0.98;
+
+    if (respBuy.ok) {
+      const dataBuy = (await respBuy.json()) as any;
+      if (Array.isArray(dataBuy) && dataBuy.length > 0 && dataBuy[0].valor) {
+        const parsedBuy = parseFloat(dataBuy[0].valor);
+        if (!isNaN(parsedBuy) && parsedBuy > 0 && parsedBuy <= sellRate) {
+          buyRate = parsedBuy;
+        }
+      }
+    }
 
     const rate: ExchangeRate = {
       currency: "USD",
-      buyRate: parseFloat(latest.valor) * 0.98, // Aproximação
-      sellRate: parseFloat(latest.valor),
-      date: latest.data,
+      buyRate,
+      sellRate,
+      date: latestSell.data,
     };
 
-    setCached(cacheKey, rate, 6 * 60 * 60); // Cache 6h
+    setCached(cacheKey, rate, 6 * 60 * 60);
     return rate;
   } catch (error) {
     console.error("Error fetching exchange rate:", error);
