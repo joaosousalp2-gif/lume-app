@@ -32,6 +32,8 @@ const MonthlyReportExport = lazy(() => import("@/components/MonthlyReportExport"
 const CategoryMonthlyComparison = lazy(() => import("@/components/CategoryMonthlyComparison"));
 const PrintableFinancialSummary = lazy(() => import("@/components/PrintableFinancialSummary"));
 const PersonalizedFinancialAdvice = lazy(() => import("@/components/PersonalizedFinancialAdvice"));
+const FinancialHealthIndicator = lazy(() => import("@/components/FinancialHealthIndicator"));
+const RecentScamCheck = lazy(() => import("@/components/RecentScamCheck"));
 const FinancialPlanningPanel = lazy(() => import("@/components/FinancialPlanningPanel"));
 const PluggyOpenBankingPanel = lazy(() => import("@/components/PluggyOpenBankingPanel"));
 const AnnualSummaryPanel = lazy(() => import("@/components/AnnualSummaryPanel"));
@@ -69,6 +71,9 @@ export default function Home() {
       icon: <Wallet className="w-5 h-5" />,
       content: (
         <div className="space-y-8">
+          <Suspense fallback={<SectionPlaceholder />}>
+            <FinancialHealthIndicator />
+          </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <PersonalizedFinancialAdvice />
           </Suspense>
@@ -120,6 +125,9 @@ export default function Home() {
       icon: <Shield className="w-5 h-5" />,
       content: (
         <div className="space-y-8">
+          <Suspense fallback={<SectionPlaceholder />}>
+            <RecentScamCheck />
+          </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <SecuritySection />
           </Suspense>

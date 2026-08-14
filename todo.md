@@ -310,3 +310,10 @@
 - [x] Adicionar confirmação visual clara após importar dados bancários e informar quando nada novo foi importado
 - [x] Reduzir interações redundantes no Agente IA flutuante e reforçar acessibilidade de teclado e leitores de ecrã
 - [x] Validar as melhorias com testes unitários, TypeScript e build de produção
+
+## Pack Coerente de Melhorias (Sênior & Segurança)
+- [x] Criar indicador visual de saúde financeira (Semáforo Financeiro: Verde, Amarelo, Vermelho) na topo da Gestão Financeira
+- [x] Adicionar um botão de "Modo Alta Legibilidade" na Navbar para aumentar instantaneamente o tamanho de letras e contraste da página
+- [x] Criar um assistente rápido de verificação de golpes recentes na aba de Segurança com alertas explicados em linguagem simples
+- [x] Adicionar testes unitários para o semáforo financeiro e o estado de alta legibilidade
+- [x] Guardar checkpoint e validar build de produção

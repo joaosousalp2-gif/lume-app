@@ -787,3 +787,34 @@ a:not([class*='btn']) {
     width: calc(100vw - 1.5rem);
   }
 }
+
+/* High-readability mode for users who prefer larger type and calmer spacing. */
+html.lume-readable {
+  font-size: 112.5%;
+}
+
+html.lume-readable body {
+  letter-spacing: 0.01em;
+}
+
+html.lume-readable p,
+html.lume-readable label,
+html.lume-readable li {
+  line-height: 1.7;
+}
+
+html.lume-readable button,
+html.lume-readable input,
+html.lume-readable select,
+html.lume-readable textarea {
+  min-height: 2.75rem;
+}
+
+html.lume-readable button:focus-visible,
+html.lume-readable a:focus-visible,
+html.lume-readable input:focus-visible,
+html.lume-readable select:focus-visible,
+html.lume-readable textarea:focus-visible {
+  outline-width: 4px;
+  outline-offset: 3px;
+}
