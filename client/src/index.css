@@ -681,10 +681,15 @@ a:not([class*='btn']) {
 @layer components {
   .lume-tutorial {
     position: fixed;
+    top: auto;
+    left: auto;
     right: 1rem;
     bottom: 1rem;
     z-index: 60;
     width: min(22rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow: auto;
+    transform: none;
     border: 1px solid rgba(147, 197, 253, 0.35);
     border-radius: 1rem;
     background: rgba(15, 23, 42, 0.96);
@@ -761,5 +766,24 @@ a:not([class*='btn']) {
       bottom: 0.75rem;
       width: calc(100vw - 1.5rem);
     }
+  }
+}
+
+/* The generic dialog rule is unlayered, so keep this tutorial-specific override unlayered too. */
+#lume-tutorial.lume-tutorial {
+  top: auto;
+  left: auto;
+  right: 5.75rem;
+  bottom: 1rem;
+  transform: none;
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+}
+
+@media (max-width: 640px) {
+  #lume-tutorial.lume-tutorial {
+    right: 0.75rem;
+    bottom: 5.5rem;
+    width: calc(100vw - 1.5rem);
   }
 }

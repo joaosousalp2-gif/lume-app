@@ -69,7 +69,7 @@ describe("Public APIs Integration", () => {
         expect(typeof ipca.value).toBe("number");
         expect(typeof ipca.date).toBe("string");
       }
-    }, { timeout: 10000 });
+    }, { timeout: 20000 });
 
     it("should fetch SELIC from BCB", async () => {
       const selic = await getSELIC();

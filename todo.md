@@ -302,3 +302,11 @@
 - [x] Configurar Open Finance com o provedor Pluggy para importação bancária real em modo de teste
 - [x] Melhorar o ícone flutuante do Agente IA com comandos de voz diretos e atalhos de ações rápidas
 - [x] Validar com testes automatizados e build de produção
+
+## Revisão Autónoma de Qualidade
+- [x] Tornar o tutorial inicial mais discreto e não bloqueante, preservando o acesso imediato ao conteúdo principal
+- [x] Criar um cartão de orientação simples para distinguir Sandbox Pluggy de ligação bancária real antes do consentimento
+- [x] Melhorar estados vazios e mensagens de erro nas áreas financeiras para pessoas 60+
+- [x] Adicionar confirmação visual clara após importar dados bancários e informar quando nada novo foi importado
+- [x] Reduzir interações redundantes no Agente IA flutuante e reforçar acessibilidade de teclado e leitores de ecrã
+- [x] Validar as melhorias com testes unitários, TypeScript e build de produção

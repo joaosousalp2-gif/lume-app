@@ -4,6 +4,7 @@ import { PluggyConnect } from "react-pluggy-connect";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
+import { formatPluggyImportSummary } from "@/lib/pluggyFeedback";
 
 export default function PluggyOpenBankingPanel() {
   const connectorsQuery = trpc.pluggy.listConnectors.useQuery(undefined, { staleTime: 5 * 60_000 });
@@ -53,6 +54,7 @@ export default function PluggyOpenBankingPanel() {
         <div className="mt-5 rounded-lg border border-violet-200 bg-violet-50 p-4">
           <p className="font-semibold text-violet-950">Ligação bancária real</p>
           <p className="mt-1 text-sm text-violet-900">Para uma conta real, use o consentimento oficial Open Finance. O Lume não recebe nem guarda a sua palavra-passe bancária.</p>
+          <p className="mt-2 text-sm text-violet-900"><strong>O que acontece a seguir:</strong> o seu banco abrirá a própria página de autorização. Reveja as permissões e confirme apenas se reconhecer a instituição.</p>
           <Button type="button" onClick={handleOpenFinance} disabled={connectTokenMutation.isPending} className="mt-3 gap-2 bg-violet-700 hover:bg-violet-800"><ExternalLink className="h-4 w-4" />{connectTokenMutation.isPending ? "A preparar consentimento..." : "Conectar banco via Open Finance"}</Button>
           {connectTokenMutation.isError && <p className="mt-2 text-sm text-red-700">Não foi possível preparar o consentimento Open Finance.</p>}
         </div>
@@ -88,8 +90,8 @@ export default function PluggyOpenBankingPanel() {
           <p className="flex items-center gap-2 font-semibold text-green-900"><CheckCircle2 className="h-5 w-5" />Item Pluggy criado com sucesso</p>
           <p className="mt-1 break-all text-xs text-green-800">ID da ligação: {itemId}</p>
           <Button type="button" variant="outline" className="mt-4 gap-2" onClick={() => importTransactions.mutate({ itemId })} disabled={importTransactions.isPending}><RefreshCw className={`h-4 w-4 ${importTransactions.isPending ? "animate-spin" : ""}`} />{importTransactions.isPending ? "A importar transações..." : "Importar transações de teste"}</Button>
-          {importTransactions.isSuccess && <p className="mt-3 text-sm text-green-900">Importação concluída: {importTransactions.data.imported} novas transações, {importTransactions.data.skipped} já existentes e {importTransactions.data.accounts} contas analisadas.</p>}
-          {importTransactions.isError && <p className="mt-3 text-sm text-red-700">A ligação foi criada, mas a leitura das transações falhou. Consulte o estado do Item na Pluggy e tente novamente.</p>}
+          {importTransactions.isSuccess && <p className="mt-3 text-sm text-green-900" role="status">{formatPluggyImportSummary(importTransactions.data)}</p>}
+          {importTransactions.isError && <p className="mt-3 text-sm text-red-700" role="alert">A ligação foi criada, mas a leitura das transações falhou. Verifique a ligação e tente novamente; os seus dados locais não foram apagados.</p>}
         </div>}
 
         <p className="mt-5 flex items-center gap-2 text-xs text-slate-500"><ExternalLink className="h-3 w-3" />O ambiente Sandbox da Pluggy devolve dados sintéticos com a mesma estrutura da API de produção.</p>

@@ -22,12 +22,12 @@ describe("Pluggy integration", () => {
     expect(item.id).toBeTruthy();
 
     let itemData: Record<string, unknown> = item;
-    for (let attempt = 0; attempt < 12; attempt += 1) {
+    for (let attempt = 0; attempt < 25; attempt += 1) {
       itemData = await getPluggyItem(item.id);
       const status = String(itemData.executionStatus ?? itemData.status ?? "");
       if (["SUCCESS", "PARTIAL_SUCCESS"].includes(status)) break;
       if (["FAILED", "LOGIN_ERROR", "ACCOUNT_LOCKED"].includes(status)) throw new Error(`Sandbox Item failed with ${status}`);
-      await new Promise((resolve) => setTimeout(resolve, 1_000));
+      await new Promise((resolve) => setTimeout(resolve, 2_000));
     }
 
     const accounts = await listPluggyAccounts(item.id);
@@ -35,7 +35,7 @@ describe("Pluggy integration", () => {
     const firstAccountId = String(accounts.results[0].id);
     const transactions = await listPluggyTransactions(firstAccountId);
     expect(Array.isArray(transactions.results)).toBe(true);
-  }, 45_000);
+  }, 65_000);
 
   it("maps a Pluggy transaction to the Lume launch contract", () => {
     expect(mapPluggyTransaction({
