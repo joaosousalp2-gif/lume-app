@@ -29,6 +29,9 @@ const AIAnalysis = lazy(() => import("@/components/AIAnalysis"));
 const BankAccounts = lazy(() => import("@/components/BankAccounts"));
 const Budget = lazy(() => import("@/components/Budget"));
 const MonthlyReportExport = lazy(() => import("@/components/MonthlyReportExport"));
+const CategoryMonthlyComparison = lazy(() => import("@/components/CategoryMonthlyComparison"));
+const PrintableFinancialSummary = lazy(() => import("@/components/PrintableFinancialSummary"));
+const PersonalizedFinancialAdvice = lazy(() => import("@/components/PersonalizedFinancialAdvice"));
 const FinancialPlanningPanel = lazy(() => import("@/components/FinancialPlanningPanel"));
 const PluggyOpenBankingPanel = lazy(() => import("@/components/PluggyOpenBankingPanel"));
 const AnnualSummaryPanel = lazy(() => import("@/components/AnnualSummaryPanel"));
@@ -66,6 +69,15 @@ export default function Home() {
       icon: <Wallet className="w-5 h-5" />,
       content: (
         <div className="space-y-8">
+          <Suspense fallback={<SectionPlaceholder />}>
+            <PersonalizedFinancialAdvice />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <CategoryMonthlyComparison />
+          </Suspense>
+          <Suspense fallback={<SectionPlaceholder />}>
+            <PrintableFinancialSummary />
+          </Suspense>
           <Suspense fallback={<SectionPlaceholder />}>
             <MonthlyReportExport />
           </Suspense>
